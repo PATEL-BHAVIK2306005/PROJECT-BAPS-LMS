@@ -16,6 +16,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Force HTTPS URL generation when behind an HTTPS proxy (Codespaces / Render)
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // If MySQL extension is not installed, automatically fallback to sqlite and file drivers
         if (!extension_loaded('pdo_mysql')) {
             config([

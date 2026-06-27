@@ -571,6 +571,43 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         });
+
+        // Static Demo Login Mocking
+        const isStatic = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+        if (isStatic) {
+            const getRedirectUrl = (page) => {
+                const pathParts = window.location.pathname.split('/');
+                if (pathParts.length > 2 && pathParts[1] !== '') {
+                    return '/' + pathParts[1] + '/' + page;
+                }
+                return '/' + page;
+            };
+
+            // Intercept student login form
+            const studentForm = document.querySelector('form[action="/login"]');
+            if (studentForm) {
+                studentForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    window.location.href = getRedirectUrl('dashboard.html');
+                });
+            }
+
+            // Intercept staff/admin login form
+            const staffForm = document.querySelector('form[action="/admin/login"]');
+            if (staffForm) {
+                staffForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('staffEmail').value;
+                    const password = document.getElementById('staffPassword').value;
+                    
+                    if (username === 'admin.bhavik@baps.ac.in' && password === 'BHAVIKKUMAR@123') {
+                        window.location.href = getRedirectUrl('admin.html');
+                    } else {
+                        alert('Invalid Admin credentials for static demo!\nUse:\nEmail: admin.bhavik@baps.ac.in\nPassword: BHAVIKKUMAR@123');
+                    }
+                });
+            }
+        }
     });
 </script>
 </body>

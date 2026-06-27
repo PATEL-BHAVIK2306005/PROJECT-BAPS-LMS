@@ -9,6 +9,15 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
+        if (env('STATIC_EXPORT') === true || env('STATIC_EXPORT') === 'true') {
+            $path = $request->getPathInfo();
+            if (str_starts_with($path, '/admin')) {
+                session(['user_role' => 'admin', 'staff_name' => 'BHAVIKKUMAR PATEL']);
+            } elseif (str_starts_with($path, '/parent')) {
+                session(['user_role' => 'parent']);
+            }
+        }
+
         $sessionRole = session('user_role');
 
         if (!$sessionRole) {

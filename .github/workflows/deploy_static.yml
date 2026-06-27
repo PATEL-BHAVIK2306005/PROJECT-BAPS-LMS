@@ -19,6 +19,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      STATIC_EXPORT: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -61,7 +63,7 @@ jobs:
         run: |
           mkdir -p dist
           cd dist
-          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent -nH http://127.0.0.1:8000 || true
+          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent -nH http://127.0.0.1:8000 http://127.0.0.1:8000/login http://127.0.0.1:8000/admin/login http://127.0.0.1:8000/register http://127.0.0.1:8000/parent/register http://127.0.0.1:8000/dashboard http://127.0.0.1:8000/admin http://127.0.0.1:8000/parent/dashboard http://127.0.0.1:8000/user-manual http://127.0.0.1:8000/logout || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

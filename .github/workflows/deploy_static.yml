@@ -46,10 +46,11 @@ jobs:
       - name: Initialize Environment & Database
         run: |
           php -r "copy('.env.example', '.env');"
+          php -r "file_put_contents('.env', str_replace('APP_URL=http://localhost', 'APP_URL=http://127.0.0.1:8000', file_get_contents('.env')));"
           php artisan key:generate
           mkdir -p database
           touch database/database.sqlite
-          php artisan migrate --force
+          php artisan migrate --force --seed
 
       - name: Start Built-in Laravel Server
         run: |
@@ -60,9 +61,7 @@ jobs:
         run: |
           mkdir -p dist
           cd dist
-          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent http://127.0.0.1:8000 || true
-          mv 127.0.0.1_8000/* . || true
-          rm -rf 127.0.0.1_8000 || true
+          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent -nH http://127.0.0.1:8000 || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

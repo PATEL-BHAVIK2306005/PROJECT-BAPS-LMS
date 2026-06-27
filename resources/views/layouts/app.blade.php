@@ -890,17 +890,18 @@ function showAccessDenied(feature, requiredRole) {
             }, 4000);
         }
 
-        // Intercept logout routes
+        // Intercept logout routes using capturing phase to override inline onclick submit()
         document.addEventListener('click', function(e) {
             const link = e.target.closest('a');
             if (link) {
                 const href = link.getAttribute('href');
                 if (href && (href.endsWith('/logout') || href.includes('logout.html') || href.endsWith('/admin/logout'))) {
                     e.preventDefault();
+                    e.stopPropagation();
                     window.location.href = getRedirectUrl('login.html');
                 }
             }
-        });
+        }, true);
 
         // Intercept form submissions to prevent 405 Method Not Allowed
         document.addEventListener('submit', function(e) {

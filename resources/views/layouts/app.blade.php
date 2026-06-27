@@ -834,6 +834,84 @@ function showAccessDenied(feature, requiredRole) {
         document.getElementById('previewIframe').src = url;
         new bootstrap.Modal(document.getElementById('filePreviewModal')).show();
     }
+
+    // Static Demo Global Router Interceptor
+    (function() {
+        const isStatic = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+        if (!isStatic) return;
+
+        function getRedirectUrl(page) {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length > 2 && pathParts[1] !== '') {
+                return '/' + pathParts[1] + '/' + page;
+            }
+            return '/' + page;
+        }
+
+        function showStaticToast(message) {
+            const existing = document.getElementById('static-demo-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'static-demo-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                background: linear-gradient(135deg, #1e293b, #0f172a);
+                color: #f8fafc;
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+                z-index: 999999;
+                font-family: 'Inter', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            `;
+            toast.innerHTML = '<i class="fas fa-info-circle" style="color: #fb923c;"></i> <span>' + message + '</span>';
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            }, 100);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Intercept logout routes
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link) {
+                const href = link.getAttribute('href');
+                if (href && (href.endsWith('/logout') || href.includes('logout.html') || href.endsWith('/admin/logout'))) {
+                    e.preventDefault();
+                    window.location.href = getRedirectUrl('login.html');
+                }
+            }
+        });
+
+        // Intercept form submissions to prevent 405 Method Not Allowed
+        document.addEventListener('submit', function(e) {
+            // Check if it's the login form (login page has its own handler)
+            if (e.target.closest('form[action="/login"]') || e.target.closest('form[action="/admin/login"]')) {
+                return;
+            }
+            e.preventDefault();
+            showStaticToast('Demo Mode: Submitting forms is disabled in this static GitHub Pages demo.');
+        });
+    })();
 </script>
 
 </body>

@@ -16,8 +16,17 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // If MySQL extension is not installed, automatically fallback to sqlite and file drivers
+        if (!extension_loaded('pdo_mysql')) {
+            config([
+                'database.default' => 'sqlite',
+                'cache.default' => 'file',
+                'session.driver' => 'file',
+            ]);
+        }
+
         // Dynamic Database Fallback Mechanism for web requests
-        if (!$this->app->runningInConsole()) {
+        if (extension_loaded('pdo_mysql') && !$this->app->runningInConsole()) {
             $defaultConn = config('database.default');
             $backupConn = 'mysql';
 

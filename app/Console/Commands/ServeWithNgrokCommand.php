@@ -32,12 +32,15 @@ class ServeWithNgrokCommand extends BaseServeCommand
         
         $this->line('<info>Initializing built-in server and Ngrok...</info>');
 
+        $domain = env('NGROK_DOMAIN');
+        $domainOption = $domain ? ' --domain=' . $domain : '';
+
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $ngrokCmd = file_exists(base_path('ngrok.exe')) ? '.\ngrok.exe' : 'ngrok';
-            pclose(popen('start /B ' . $ngrokCmd . ' http ' . $port . ' > NUL 2>&1', 'r'));
+            pclose(popen('start /B ' . $ngrokCmd . ' http ' . $port . $domainOption . ' > NUL 2>&1', 'r'));
         } else {
             $ngrokCmd = file_exists(base_path('ngrok')) ? './ngrok' : 'ngrok';
-            exec($ngrokCmd . ' http ' . $port . ' > /dev/null 2>&1 &');
+            exec($ngrokCmd . ' http ' . $port . $domainOption . ' > /dev/null 2>&1 &');
         }
 
         // Wait for ngrok to initialize its local API

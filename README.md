@@ -1,58 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Deela LMS: Comprehensive Academic Learning Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel Version](https://img.shields.io/badge/Laravel-13.1.1-red.svg)](https://laravel.com)
+[![PHP Version](https://img.shields.io/badge/PHP-%3E%3D_8.5.0-blue.svg)](https://php.net)
+[![CustomTkinter](https://img.shields.io/badge/Desktop_GUI-CustomTkinter-orange.svg)](https://github.com/tomschimansky/CustomTkinter)
+[![Database](https://img.shields.io/badge/Database-MySQL_/_TiDB_Cloud-teal.svg)](https://tidbcloud.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## About Laravel
+**Deela LMS (BAPS-e-Learning)** is a premium, high-fidelity Learning Management System designed to streamline academic operations, curriculum distribution, time-table scheduling, student enrollment validation, evaluations, and bulk credentials certification. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Equipped with an advanced **Python Desktop Control Center** (built on CustomTkinter), the application offers a unified developer & operator launchpad supporting local offline environments (XAMPP) as well as direct remote internet cloud services (TiDB Cloud) with built-in secure public tunnels.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Core Features Matrix
 
-## Learning Laravel
+### 1. Hybrid Authentication & 5-Digit Passcodes
+- **12-Point Biodata Check-in**: The `/register` portal captures key metrics (Enrollment ID, ABC ID, Blood Group, Aadhar number, Guardian info, etc.).
+- **Verification Queue**: Registrations default to a strict `pending` state blocking unauthorized access.
+- **Passcode Allocation**: HOD/Admin approvals automatically generate a secure, encrypted **5-digit login passcode**, replacing weak traditional passwords.
+- **Insta-Approval Checkpoints**: Authorized personnel (CRs, Faculty, HODs) submitting registrations instantly bypass the queue with immediate passcode generation.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Modern Interactive Curriculum Builder
+- **Multimedia Delivery**: Direct upload support for raw `.mp4` video lectures (with server-side validation & size limits), integrated YouTube streams, and downloadable PDF academic resources.
+- **Progress Tracking Engine**: Seamless completion matrix tracking (`Completed Lessons == Total Lessons`) transitioning student progress status dynamically.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Smart Timetable merging
+- **Consecutive Hour Detection**: The builder calculates timetables cell-by-cell. For longer classes (like consecutive 2+ hour labs), the system calculates coordinates and uses HTML `rowspan` to merge blocks visually on a dynamic student grid.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 4. Interactive Quiz & Auto-Certification Engine
+- **Relational Assessment Arrays**: Evaluates student knowledge using custom multi-choice questionnaires connected dynamically to course nodes.
+- **Auto-Grade Evaluation**: Grade attempts server-side against correct answer keys.
+- **Instant Certificate Issuance**: Generates A4 landscape academic diplomas dynamically with Barryvdh DomPDF on passing grades. Includes a unique verification stamp (e.g. `MAN-XYZ789`) to prevent forgery.
+- **1-Click CR Issuance**: Empowers Class Representatives (CRs) to issue pending certificates with one click once progress reaches 100%.
+- **Bulk Certificate Bundler**: Simplifies graduation management by looping over entire cohorts, handling blank-email placeholders, and outputting a single merged PDF document with programmatic page breaks.
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🖥️ Python LMS Control Center Launcher
 
-```bash
-composer require laravel/boost --dev
+The desktop app [run_app.py](run_app.py) provides a modern dashboard for running the LMS locally and configuring connections:
 
-php artisan boost:install
-```
+- **Launch Mode 1: With XAMPP (Local Offline)** — Launches local Apache Web Server and MySQL database, routing the application to `http://localhost/deela/public/`.
+- **Launch Mode 2: Without Apache (Artisan + Local MySQL)** — Shuts down Apache and runs the built-in PHP development server (`php artisan serve`) mapping local MySQL.
+- **Launch Mode 3: Online Cloud Mode (Artisan - No XAMPP)** — Bypasses all local server binaries. Runs the Artisan server connecting directly to the **TiDB Cloud Database** (configured in `.env`). Great for developer testing without local database stacks.
+- **Sleek CustomTkinter UI**: Features rounded cards, high-contrast console log terminals, and a live light/dark appearance theme switcher.
+- **Customized Public Sharing**: Integrated Ngrok tunnel launching supporting customized subdomain configurations.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 📶 Customized Public Tunnel (Ngrok)
+The Laravel built-in dev server has been extended via a custom command `php artisan serve` to spin up a public secure tunnel dynamically:
+- **Custom Domain**: Configured to serve the portal on the custom address: **`baps-lms-seva.ngrok-free.app`**
+- **Configuration**: Easily configurable via the `NGROK_DOMAIN` environment variable in your `.env`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🛠️ Technology Stack
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+*   **Backend Framework**: Laravel 13.1.1 (PHP >= 8.5.0)
+*   **Database**: Dual support for Local MySQL (XAMPP) & TiDB Cloud (AWS Cloud Relational MySQL Gateway)
+*   **Frontend UI Engine**: Custom CSS Glassmorphism, Bootstrap 5.3, jQuery 3.7
+*   **PDF Compiler**: Barryvdh Laravel DomPDF
+*   **Desktop App Frame**: Python 3.12, CustomTkinter 6.0, PyWebview (with standard Tkinter UI fallback)
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📦 Local Installation & Setup
 
-## License
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/PATEL-BHAVIK2306005/PROJECT-BAPS-LMS.git
+    cd PROJECT-BAPS-LMS
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2.  **Environment Setup**:
+    - Copy `.env.example` to `.env`
+    - Configure your TiDB Cloud database coordinates or local MySQL credentials.
+    - Set the customized public domain:
+      ```ini
+      NGROK_DOMAIN=baps-lms-seva.ngrok-free.app
+      ```
+
+3.  **Install PHP & JS Dependencies**:
+    ```bash
+    composer install
+    npm install && npm run dev
+    ```
+
+4.  **Setup Keys and DB**:
+    ```bash
+    php artisan key:generate
+    php artisan migrate
+    ```
+
+5.  **Run the Desktop Launcher**:
+    Ensure `customtkinter` is installed:
+    ```bash
+    pip install customtkinter pillow
+    ```
+    Launch the GUI Control Center:
+    ```bash
+    python run_app.py --gui
+    ```
+
+---
+
+## 🔒 Production Deployments
+When hosting the application live on a VPS or cloud service:
+- Set `APP_DEBUG=false` in your `.env`.
+- Point the virtual host document root directly to the `/public` directory.
+- Run optimizations:
+  ```bash
+  php artisan config:cache
+  php artisan route:cache
+  php artisan view:cache
+  ```

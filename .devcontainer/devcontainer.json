@@ -1,0 +1,17 @@
+{
+    "name": "PROJECT-BAPS-LMS",
+    "image": "mcr.microsoft.com/devcontainers/php:8.3",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {}
+    },
+    "forwardPorts": [8000],
+    "portsAttributes": {
+        "8000": {
+            "label": "LMS Server",
+            "onAutoForward": "openBrowser",
+            "visibility": "public"
+        }
+    },
+    "postCreateCommand": "cp .env.example .env && touch database/database.sqlite && composer install --ignore-platform-reqs && npm install && npm run build && php artisan key:generate && php artisan migrate --force",
+    "postStartCommand": "php artisan serve"
+}

@@ -1,0 +1,77 @@
+name: Deploy Static Laravel to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, readline
+
+      - name: Install Composer Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --ignore-platform-req=php
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install NPM dependencies & build assets
+        run: |
+          npm install
+          npm run build
+
+      - name: Initialize Environment & Database
+        run: |
+          php -r "copy('.env.example', '.env');"
+          php artisan key:generate
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan migrate --force
+
+      - name: Start Built-in Laravel Server
+        run: |
+          php artisan serve --port=8000 &
+          sleep 3
+
+      - name: Crawl and Export Laravel Pages to Static HTML
+        run: |
+          mkdir -p dist
+          cd dist
+          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent http://127.0.0.1:8000 || true
+          mv 127.0.0.1_8000/* . || true
+          rm -rf 127.0.0.1_8000 || true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

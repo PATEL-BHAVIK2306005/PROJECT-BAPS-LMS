@@ -81,8 +81,8 @@ return [
             'engine' => null,
             'options' => env('DB_ONLINE_SSL') ? [
                 \PDO::ATTR_TIMEOUT => 3,
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => true,
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => false,
+                (defined('PDO::MYSQL_ATTR_SSL_CA') ? \PDO::MYSQL_ATTR_SSL_CA : 1007) => true,
+                (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') ? \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT : 1014) => false,
             ] : [
                 \PDO::ATTR_TIMEOUT => 3,
             ],

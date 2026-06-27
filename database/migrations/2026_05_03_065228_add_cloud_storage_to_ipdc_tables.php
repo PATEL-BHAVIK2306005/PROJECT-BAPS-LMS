@@ -12,20 +12,37 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('external_certifications', function (Blueprint $table) {
-            $table->string('mime_type')->nullable();
-        });
-        DB::statement('ALTER TABLE external_certifications ADD file_content LONGBLOB NULL');
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('external_certifications', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+                $table->binary('file_content')->nullable();
+            });
 
-        Schema::table('ipdc_assets', function (Blueprint $table) {
-            $table->string('mime_type')->nullable();
-        });
-        DB::statement('ALTER TABLE ipdc_assets ADD file_content LONGBLOB NULL');
+            Schema::table('ipdc_assets', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+                $table->binary('file_content')->nullable();
+            });
 
-        Schema::table('task_submissions', function (Blueprint $table) {
-            $table->string('mime_type')->nullable();
-        });
-        DB::statement('ALTER TABLE task_submissions ADD file_content LONGBLOB NULL');
+            Schema::table('task_submissions', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+                $table->binary('file_content')->nullable();
+            });
+        } else {
+            Schema::table('external_certifications', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+            });
+            DB::statement('ALTER TABLE external_certifications ADD file_content LONGBLOB NULL');
+
+            Schema::table('ipdc_assets', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+            });
+            DB::statement('ALTER TABLE ipdc_assets ADD file_content LONGBLOB NULL');
+
+            Schema::table('task_submissions', function (Blueprint $table) {
+                $table->string('mime_type')->nullable();
+            });
+            DB::statement('ALTER TABLE task_submissions ADD file_content LONGBLOB NULL');
+        }
     }
 
     /**

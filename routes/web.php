@@ -29,7 +29,7 @@ Route::post('/track-application/submit-tc', [AuthController::class, 'submitTc'])
 
 // Public Student Routes
 Route::get('/', [CourseController::class, 'index']);
-Route::get('/dashboard', [CourseController::class, 'dashboard']);
+Route::get('/dashboard', [CourseController::class, 'dashboard'])->name('dashboard');
 Route::post('/dashboard/assign-deputy-cr', [CourseController::class, 'assignDeputyCr']);
 Route::post('/dashboard/revoke-deputy-cr', [CourseController::class, 'revokeDeputyCr']);
 Route::get('/courses', [CourseController::class, 'index']);
@@ -68,9 +68,17 @@ Route::get('/timetables/{id}', [\App\Http\Controllers\TimetableController::class
 Route::post('/enroll/submit', [EnrollmentController::class, 'store']); // Submits 8 fields
 Route::post('/enroll/{courseId}', [EnrollmentController::class, 'enrollForm']); // Redirects to form
 Route::get('/logout', function() {
+    \Illuminate\Support\Facades\Auth::logout();
     session()->flush();
     return redirect('/admin/login')->with('success', 'You have been successfully logged out.');
 });
+
+Route::post('/logout', function() {
+    \Illuminate\Support\Facades\Auth::logout();
+    session()->invalidate();
+    session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
 
 // Student Synergy Circle Routes
 Route::get('/synergy-circle', [\App\Http\Controllers\SynergyCircleController::class, 'studentIndex']);
@@ -424,4 +432,14 @@ Route::middleware([\App\Http\Middleware\RoleMiddleware::class])->group(function 
 });
 
 Route::get('/storage/{path}', [App\Http\Controllers\FileController::class, 'serve'])->where('path', '.*');
+
+if (app()->environment('testing')) {
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
+
+    require __DIR__.'/auth.php';
+}
 

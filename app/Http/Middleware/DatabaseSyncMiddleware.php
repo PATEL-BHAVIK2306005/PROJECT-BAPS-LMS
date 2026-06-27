@@ -14,6 +14,10 @@ class DatabaseSyncMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        if (app()->environment('testing')) {
+            return $next($request);
+        }
+
         // Throttled background bi-directional sync (runs every 30 seconds in a background process)
         if (!Cache::has('db_bidirectional_sync_running')) {
             Cache::put('db_bidirectional_sync_running', true, now()->addSeconds(30));
@@ -28,6 +32,9 @@ class DatabaseSyncMiddleware
      */
     public function terminate(Request $request, $response)
     {
+        if (app()->environment('testing')) {
+            return;
+        }
         app(DatabaseSyncService::class)->syncPending();
     }
 

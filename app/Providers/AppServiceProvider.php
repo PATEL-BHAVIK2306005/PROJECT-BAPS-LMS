@@ -42,17 +42,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register global event listeners for database replication sync
-        \Illuminate\Support\Facades\Event::listen('eloquent.saved: *', function ($event, $data) {
-            if (!empty($data[0]) && $data[0] instanceof \Illuminate\Database\Eloquent\Model) {
-                app(\App\Services\DatabaseSyncService::class)->recordSaved($data[0]);
-            }
-        });
+        if (!$this->app->environment('testing')) {
+            \Illuminate\Support\Facades\Event::listen('eloquent.saved: *', function ($event, $data) {
+                if (!empty($data[0]) && $data[0] instanceof \Illuminate\Database\Eloquent\Model) {
+                    app(\App\Services\DatabaseSyncService::class)->recordSaved($data[0]);
+                }
+            });
 
-        \Illuminate\Support\Facades\Event::listen('eloquent.deleted: *', function ($event, $data) {
-            if (!empty($data[0]) && $data[0] instanceof \Illuminate\Database\Eloquent\Model) {
-                app(\App\Services\DatabaseSyncService::class)->recordDeleted($data[0]);
-            }
-        });
+            \Illuminate\Support\Facades\Event::listen('eloquent.deleted: *', function ($event, $data) {
+                if (!empty($data[0]) && $data[0] instanceof \Illuminate\Database\Eloquent\Model) {
+                    app(\App\Services\DatabaseSyncService::class)->recordDeleted($data[0]);
+                }
+            });
+        }
     }
 }
 

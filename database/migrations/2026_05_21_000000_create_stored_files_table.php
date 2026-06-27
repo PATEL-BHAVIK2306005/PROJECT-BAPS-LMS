@@ -21,7 +21,9 @@ return new class extends Migration
         });
 
         // Ensure we support files up to 4GB using LONGBLOB in MySQL/TiDB
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE stored_files MODIFY contents LONGBLOB");
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE stored_files MODIFY contents LONGBLOB");
+        }
     }
 
     /**

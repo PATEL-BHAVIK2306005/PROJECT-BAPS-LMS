@@ -26,6 +26,7 @@ Route::get('/parent/register', [AuthController::class, 'showParentRegister']);
 Route::post('/parent/register', [AuthController::class, 'parentRegister']);
 Route::post('/track-application', [AuthController::class, 'trackApplication']);
 Route::post('/track-application/submit-tc', [AuthController::class, 'submitTc']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Public Student Routes
 Route::get('/', [CourseController::class, 'index']);
@@ -67,18 +68,6 @@ Route::get('/timetables', [\App\Http\Controllers\TimetableController::class, 'st
 Route::get('/timetables/{id}', [\App\Http\Controllers\TimetableController::class, 'show']);
 Route::post('/enroll/submit', [EnrollmentController::class, 'store']); // Submits 8 fields
 Route::post('/enroll/{courseId}', [EnrollmentController::class, 'enrollForm']); // Redirects to form
-Route::get('/logout', function() {
-    \Illuminate\Support\Facades\Auth::logout();
-    session()->flush();
-    return redirect('/admin/login')->with('success', 'You have been successfully logged out.');
-});
-
-Route::post('/logout', function() {
-    \Illuminate\Support\Facades\Auth::logout();
-    session()->invalidate();
-    session()->regenerateToken();
-    return redirect('/');
-})->name('logout');
 
 // Student Synergy Circle Routes
 Route::get('/synergy-circle', [\App\Http\Controllers\SynergyCircleController::class, 'studentIndex']);
@@ -155,7 +144,7 @@ Route::get('/certificate/{courseId}/preview', function($courseId) {
 });
 
 // Admin Password// Login routes
-Route::get('/admin/login', [AdminController::class, 'loginPage']);
+Route::get('/admin/login', [AdminController::class, 'loginPage'])->name('admin.login');
 Route::post('/admin/login', [AdminController::class, 'loginSubmit']);
 Route::get('/admin/secure-verify', [AdminController::class, 'secureVerifyPage']);
 Route::post('/admin/secure-verify', [AdminController::class, 'secureVerifySubmit']);
@@ -171,7 +160,7 @@ Route::post('/admin/log-emailjs-status', function (\Illuminate\Http\Request $req
 });
 
 // Admin Logout
-Route::get('/admin/logout', [AdminController::class, 'logout']);
+Route::match(['get', 'post'], '/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 // Protected Admin/Instructor/Moderator Routes
 Route::middleware([\App\Http\Middleware\RoleMiddleware::class])->group(function () {
@@ -442,4 +431,3 @@ if (app()->environment('testing')) {
 
     require __DIR__.'/auth.php';
 }
-

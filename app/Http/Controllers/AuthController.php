@@ -258,4 +258,13 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Parent account registered successfully. Please log in with your email & password.');
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
 }

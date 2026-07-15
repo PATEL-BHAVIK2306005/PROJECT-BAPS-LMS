@@ -51,4 +51,13 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_logout_is_not_available_via_get_request(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/logout');
+
+        $response->assertNotFound();
+    }
 }

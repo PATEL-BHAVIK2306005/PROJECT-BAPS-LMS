@@ -143,6 +143,36 @@ class AuthController extends Controller
         // Configure vital session properties that the rest of the application depends on
         session(['user_role' => $user->role ?? 'student']);
         
+        // If this user is a staff-level user (admin/dean/hod), try to mirror the AdminController session
+        if (in_array($user->role, ['admin', 'dean', 'hod'])) {
+            try {
+                $staff = \App\Models\Staff::where('email', $user->email)->first();
+                if ($staff) {
+                    // Set the same session keys AdminController expects
+                    session([
+                        'user_role' => $staff->role ?? $user->role,
+                        'staff_id' => $staff->id,
+                        'staff_name' => $staff->name,
+                        'dept_id' => $staff->department_id
+                    ]);
+                } else {
+                    // Fallback: set minimal staff session using User's data
+                    session([
+                        'user_role' => $user->role,
+                        'staff_id' => $user->id,
+                        'staff_name' => $user->name,
+                        'dept_id' => $user->department_id ?? null
+                    ]);
+                }
+
+                // Redirect to admin area (user will have same session shape as AdminController after secure verify)
+                return redirect('/admin');
+            } catch (\Exception $e) {
+                // On error, log and continue to normal dashboard
+                \Illuminate\Support\Facades\Log::warning('Failed to mirror staff session after unified login: ' . $e->getMessage());
+            }
+        }
+        
         if ($user->role === 'parent') {
             return redirect('/parent/dashboard');
         }

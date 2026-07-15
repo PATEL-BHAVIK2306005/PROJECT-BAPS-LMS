@@ -262,9 +262,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     <i class="fas fa-sign-out-alt me-1"></i> Exit Dean Demo
                 </a>
             @endif
-            <a href="/logout" class="btn btn-outline-danger border-0 rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Logout">
-                <i class="fas fa-power-off"></i>
-            </a>
+            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger border-0 rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Logout">
+                    <i class="fas fa-power-off"></i>
+                </button>
+            </form>
             <button id="themeToggle" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px;">
                 <i class="fas fa-moon"></i>
             </button>

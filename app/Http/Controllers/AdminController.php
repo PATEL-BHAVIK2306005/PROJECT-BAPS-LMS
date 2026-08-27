@@ -1077,19 +1077,71 @@ class AdminController extends Controller
 
     public function enterDemoMode($id)
     {
+        if (!session()->has('original_user_role')) {
+            session([
+                'original_user_role' => session('user_role'),
+                'original_staff_id' => session('staff_id'),
+                'original_staff_name' => session('staff_name'),
+                'original_dept_id' => session('dept_id'),
+            ]);
+        }
+
         session(['demo_user_id' => $id]);
         return redirect('/courses')->with('success', 'Entered Demo Mode (Viewing as Student)');
+    }
+
+    public function enterStaffDemoMode($id)
+    {
+        $staff = \App\Models\Staff::findOrFail($id);
+
+        if (!session()->has('original_user_role')) {
+            session([
+                'original_user_role' => session('user_role'),
+                'original_staff_id' => session('staff_id'),
+                'original_staff_name' => session('staff_name'),
+                'original_dept_id' => session('dept_id'),
+            ]);
+        }
+
+        session([
+            'user_role' => $staff->role,
+            'staff_id' => $staff->id,
+            'staff_name' => $staff->name,
+            'dept_id' => $staff->department_id
+        ]);
+
+        return redirect('/admin')->with('success', "Logged in as {$staff->name} (Demo Mode)");
     }
 
     public function exitDemoMode()
     {
         session()->forget('demo_user_id');
+
+        if (session()->has('original_user_role')) {
+            session([
+                'user_role' => session('original_user_role'),
+                'staff_id' => session('original_staff_id'),
+                'staff_name' => session('original_staff_name'),
+                'dept_id' => session('original_dept_id'),
+            ]);
+
+            session()->forget([
+                'original_user_role',
+                'original_staff_id',
+                'original_staff_name',
+                'original_dept_id',
+            ]);
+
+            return redirect('/admin')->with('success', 'Exited Demo Mode');
+        }
+
         if (session('user_role') === 'placement-dean' || (session('user_role') === 'dean' && session('staff_id') === 888)) {
             session()->forget('user_role');
             session()->forget('staff_id');
             session()->forget('staff_name');
             return redirect('/')->with('success', 'Exited Demo Mode');
         }
+
         return redirect('/admin/enrollments')->with('success', 'Exited Demo Mode');
     }
 

@@ -160,6 +160,18 @@
         box-shadow: 0 4px 12px rgba(8, 145, 178, 0.35);
     }
     
+    .btn-demo {
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.15);
+    }
+    .btn-demo:hover {
+        color: #ffffff;
+        background-color: #10b981 !important;
+        border-color: #10b981;
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    
     .btn-delete {
         color: #dc2626;
         border-color: rgba(220, 38, 38, 0.15);
@@ -691,6 +703,9 @@
                                     <button class="btn btn-action-icon btn-allocate" title="Allocate Course" data-bs-toggle="modal" data-bs-target="#allocateModal{{$s->id}}">
                                         <i class="fas fa-book-open"></i>
                                     </button>
+                                    <a href="/admin/demo-staff/{{ $s->id }}" class="btn btn-action-icon btn-demo" title="Demo View (Login As Staff)">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     @if(session('staff_id') != $s->id)
                                     <button class="btn btn-action-icon btn-delete" title="Delete Faculty Member" data-bs-toggle="modal" data-bs-target="#deleteStaffModal{{$s->id}}">
                                         <i class="fas fa-trash-alt"></i>

@@ -265,6 +265,32 @@
 
         <!-- Badges & Lab Privilege Showcase (Right Column) -->
         <div class="col-lg-4">
+            <!-- Mentor Profile Card -->
+            <div class="glass-card p-4 mb-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-tie fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-0">My Assigned Mentor</h5>
+                </div>
+                @if($primaryMentor)
+                    <div class="d-flex align-items-center gap-3 bg-light bg-opacity-50 p-3 rounded-3 border border-white">
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 50px; height: 50px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); font-size: 1.15rem; flex-shrink: 0;">
+                            {{ strtoupper(substr($primaryMentor->name ?? 'ME', 0, 2)) }}
+                        </div>
+                        <div style="min-width: 0;">
+                            <h6 class="fw-bold mb-0 text-dark text-truncate">{{ $primaryMentor->name }}</h6>
+                            <small class="text-muted d-block text-truncate" style="font-size: 0.8rem;">{{ implode(', ', $primaryMentor->positions ?? [$primaryMentor->role]) }}</small>
+                            <span class="badge bg-success bg-opacity-10 text-success mt-1" style="font-size: 0.65rem; border: 1px solid rgba(25, 135, 84, 0.2);"><i class="fas fa-circle-check me-1"></i> Active Mentor</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-3 text-muted small border border-dashed rounded-3">
+                        <i class="fas fa-user-slash opacity-50 mb-1 d-block"></i> No academic mentor assigned.
+                    </div>
+                @endif
+            </div>
+
             <!-- Badges Section -->
             <div class="glass-card p-4 mb-4">
                 <h4 class="fw-bold text-dark mb-3"><i class="fas fa-shield-halved text-warning me-2"></i> Earned Credentials</h4>

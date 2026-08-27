@@ -528,6 +528,9 @@
                                             <a href="/admin/students/{{ $user->id }}/progress" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 fw-bold text-dark hover-shadow">
                                                 <i class="fas fa-chart-line text-info me-1"></i> Academic Progress
                                             </a>
+                                            <a href="/admin/demo-student/{{ $user->id }}" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 fw-bold text-dark hover-shadow">
+                                                <i class="fas fa-book-open text-info me-1"></i> Demo View
+                                            </a>
                                             <a href="mailto:{{ $user->email }}" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 fw-bold text-dark hover-shadow">
                                                 <i class="fas fa-paper-plane text-primary me-1"></i> Send Email
                                             </a>

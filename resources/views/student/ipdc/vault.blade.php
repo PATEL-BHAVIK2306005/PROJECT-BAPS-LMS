@@ -387,12 +387,12 @@
         if (mode === 'pdf') {
             let url = currentStudentPreview.file;
             
-            // Fix ngrok mixed-content issues (HTTP iframe in HTTPS page)
+            // Fix public tunnel mixed-content issues (HTTP iframe in HTTPS page)
             if (url.startsWith('http://')) {
                 url = url.replace('http://', 'https://');
             }
 
-            // Use native browser rendering to bypass ngrok external fetch blocks
+            // Use native browser rendering to bypass tunnel external fetch blocks
             iframe.src = url;
             
             iframe.classList.remove('d-none');

@@ -37,6 +37,15 @@ Thumbs.db
 
 # Development Scratch Scripts and Logs
 /scratch/
-/scratch_revert.py
-/scratch_test_ai.php
-*.log
+/scratch_*.php
+/scratch_*.py
+scratch_*.php
+scratch_*.py
+
+# Python Cache
+__pycache__/
+*.py[cod]
+
+# Storage session files
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore

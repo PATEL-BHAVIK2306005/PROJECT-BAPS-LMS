@@ -19,8 +19,8 @@ class SynergyCircleController extends Controller
     public function studentIndex()
     {
         $role = session('user_role');
-        if (!in_array($role, ['admin', 'dean'])) {
-            abort(403, 'Synergy Circle is currently open for testing only for Admin and Dean.');
+        if (!in_array($role, ['admin', 'dean', 'student', 'cr'])) {
+            abort(403, 'Synergy Circle is currently open for testing only.');
         }
 
         $userId = session('demo_user_id') ?? auth()->id() ?? 1;
@@ -50,7 +50,21 @@ class SynergyCircleController extends Controller
             ->latest()
             ->get();
 
-        return view('student.synergy_circle', compact('user', 'requests', 'mentors', 'badges', 'privileges'));
+        // 5. Resolve primary mentor
+        $primaryMentor = null;
+        $latestRequestWithMentor = CodeReviewRequest::where('user_id', $userId)
+            ->whereNotNull('mentor_id')
+            ->with('mentor')
+            ->latest()
+            ->first();
+            
+        if ($latestRequestWithMentor) {
+            $primaryMentor = $latestRequestWithMentor->mentor;
+        } else {
+            $primaryMentor = Staff::whereIn('role', ['faculty', 'hod', 'dean'])->first();
+        }
+
+        return view('student.synergy_circle', compact('user', 'requests', 'mentors', 'badges', 'privileges', 'primaryMentor'));
     }
 
     /**

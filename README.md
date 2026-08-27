@@ -44,14 +44,15 @@ The desktop app [run_app.py](run_app.py) provides a modern dashboard for running
 - **Launch Mode 2: Without Apache (Artisan + Local MySQL)** — Shuts down Apache and runs the built-in PHP development server (`php artisan serve`) mapping local MySQL.
 - **Launch Mode 3: Online Cloud Mode (Artisan - No XAMPP)** — Bypasses all local server binaries. Runs the Artisan server connecting directly to the **TiDB Cloud Database** (configured in `.env`). Great for developer testing without local database stacks.
 - **Sleek CustomTkinter UI**: Features rounded cards, high-contrast console log terminals, and a live light/dark appearance theme switcher.
-- **Customized Public Sharing**: Integrated Ngrok tunnel launching supporting customized subdomain configurations.
+- **Customized Public Sharing**: Integrated LocalTunnel and Pinggy public tunnels supporting custom subdomain mapping.
 
 ---
 
-## 📶 Customized Public Tunnel (Ngrok)
+## 📶 Customized Public Tunnel (LocalTunnel / Pinggy)
 The Laravel built-in dev server has been extended via a custom command `php artisan serve` to spin up a public secure tunnel dynamically:
-- **Custom Domain**: Configured to serve the portal on the custom address: **`baps-lms-seva.ngrok-free.app`**
-- **Configuration**: Easily configurable via the `NGROK_DOMAIN` environment variable in your `.env`.
+- **Default Provider (LocalTunnel)**: Automatically starts LocalTunnel using Node (`npx localtunnel`).
+- **Zero-Install Provider (Pinggy)**: Connects via SSH (`ssh free.pinggy.io`) without requiring any downloads.
+- **Configuration**: Easily configurable via the `TUNNEL_PROVIDER` (set to `localtunnel` or `pinggy`) and `TUNNEL_SUBDOMAIN` (e.g. `baps-lms-seva`) environment variables in your `.env`.
 
 ---
 

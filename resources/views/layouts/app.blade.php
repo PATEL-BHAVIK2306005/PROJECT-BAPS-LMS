@@ -15,7 +15,402 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="{{ (session('user_role') === 'student') ? 'student-theme' : '' }}">
+@php 
+    $userId = session('demo_user_id') ?? auth()->id() ?? 1;
+    $user = auth()->user() ?? \App\Models\User::find($userId); 
+@endphp
+
+@if(session('user_role') === 'student')
+<!-- Student Layout Styles -->
+<style>
+    body.student-theme {
+        padding-top: 0 !important;
+    }
+    body.student-theme .main-content {
+        margin-left: 0 !important;
+        padding: 2.5rem 1.5rem !important;
+        max-width: 1400px;
+        margin: 0 auto !important;
+        transition: all 0.3s ease;
+    }
+    body.student-theme main {
+        padding-left: 0 !important;
+    }
+    body.student-theme .top-nav {
+        display: none !important;
+    }
+
+    /* White Header styling */
+    .student-header {
+        background-color: #ffffff;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    body.dark-mode .student-header {
+        background-color: #111827 !important;
+        border-bottom-color: #374151 !important;
+    }
+
+    /* Dark Navbar styling */
+    .student-navbar {
+        background: #374151; /* Dark grey */
+        padding: 0;
+        min-height: 48px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border-bottom: 2px solid #ea580c; /* Saffron accents */
+    }
+    body.dark-mode .student-navbar {
+        background-color: #1f2937 !important;
+        border-bottom-color: #d4af37 !important; /* Gold border-bottom on dark mode */
+    }
+
+    .student-nav-container {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+    .student-nav-container::-webkit-scrollbar {
+        display: none;
+    }
+    .student-nav-item {
+        color: #d1d5db !important;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 14px 16px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease-in-out;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+    }
+    .student-nav-item:hover, .student-nav-item:focus {
+        background-color: rgba(255, 255, 255, 0.06);
+        color: #ffffff !important;
+    }
+    .student-nav-item.active {
+        background-color: #232731 !important; /* Active darker grey */
+        color: #ffffff !important;
+        border-bottom: 2px solid #ea580c;
+    }
+    body.dark-mode .student-nav-item.active {
+        border-bottom-color: #d4af37 !important;
+    }
+    .student-dropdown-menu {
+        background-color: #1f2937 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 8px !important;
+        margin-top: 0 !important;
+        padding: 6px 0 !important;
+        animation: fadeIn 0.15s ease-out;
+    }
+    .student-dropdown-item {
+        color: #9ca3af !important;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s ease;
+    }
+    .student-dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+    }
+    .student-dropdown-item i {
+        width: 14px;
+        text-align: center;
+    }
+    body.dark-mode .logo-university-text {
+        color: #f3f4f6 !important;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="student-header">
+    <!-- ITM Baroda University Inline HTML/CSS Premium Responsive Logo -->
+    <div class="d-flex align-items-center gap-3">
+        <div style="display: flex; gap: 4px; align-items: stretch; height: 42px;">
+            <div style="background-color: #dc2626; width: 8px; border-radius: 2px;"></div>
+            <div style="background-color: #dc2626; width: 8px; border-radius: 2px;"></div>
+            <div style="background-color: #dc2626; width: 8px; border-radius: 2px;"></div>
+            <div style="display: flex; flex-direction: column; justify-content: center; margin-left: 4px;">
+                <span style="font-family: 'Arial Black', Impact, sans-serif; font-size: 1.5rem; font-weight: 900; color: #dc2626; line-height: 1; letter-spacing: -0.5px;">ITM</span>
+                <span class="logo-university-text" style="font-family: 'Inter', sans-serif; font-size: 0.55rem; font-weight: 800; color: #1f2937; letter-spacing: 0.5px; line-height: 1;">BARODA UNIVERSITY</span>
+            </div>
+        </div>
+        <div style="height: 34px; width: 1px; background-color: #e5e7eb;"></div>
+        <div class="logo-motto-container" style="display: flex; flex-direction: column; justify-content: center;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 0.55rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Vadodara | Gujarat | India</span>
+            <span style="font-family: 'Georgia', serif; font-style: italic; font-size: 0.6rem; color: #ea580c; font-weight: 700; margin-top: 1px;">"Think Big... Think Beyond"</span>
+        </div>
+    </div>
+    
+    <!-- User Profile display on right -->
+    <div class="d-flex align-items-center gap-3">
+        @if(session()->has('original_user_role') || (session('user_role') === 'dean' && session('staff_id') === 888) || (session('demo_user_id') && !session()->has('original_user_role')))
+            <a href="/admin/exit-demo" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1" style="font-size: 0.8rem;">
+                <i class="fas fa-sign-out-alt"></i> Exit Demo Mode
+            </a>
+        @endif
+        <button id="studentThemeToggle" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" onclick="document.getElementById('themeToggle').click()">
+            <i class="fas fa-moon"></i>
+        </button>
+        <div class="text-end d-none d-md-block">
+            <span class="text-muted small" style="font-style: italic;">Hi,</span>
+            <span class="fw-bold text-teal text-uppercase" style="color: #0e9f6e; font-size: 0.92rem; display: block;">
+                {{ $user->name ?? 'Student User' }}
+            </span>
+        </div>
+        <div class="avatar-container">
+            @if($user && $user->photo)
+                <img src="/profile/photo/student/{{ $user->id }}" class="rounded-circle border shadow-sm" style="width: 45px; height: 45px; object-fit: cover;" alt="Avatar">
+            @else
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 45px; height: 45px; background-color: #0e9f6e; font-size: 1.1rem;">
+                    {{ strtoupper(substr($user->name ?? 'ST', 0, 2)) }}
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark student-navbar">
+    <div class="container-fluid p-0">
+        <div class="student-nav-container">
+            <!-- 1. Internal Assessment Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-chart-pie"></i> Internal Assessment
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/results"><i class="fas fa-table"></i> View Internal Marks</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/results"><i class="fas fa-file-invoice"></i> Grade Sheet</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/excellence-cert"><i class="fas fa-award"></i> Excellence Certificate</a></li>
+                </ul>
+            </div>
+
+            <!-- 2. Transport Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-bus"></i> Transport
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="#" onclick="showBapsToast('Bus Schedule: Route 1 to 5 - Active', 'info')"><i class="fas fa-clock"></i> Bus Schedules</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="#" onclick="showBapsToast('Bus Routes are synced with student RFID.', 'info')"><i class="fas fa-route"></i> Track My Route</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-ticket-alt"></i> Gatepass Requests</a></li>
+                </ul>
+            </div>
+
+            <!-- 3. Dashboard Link -->
+            <a class="student-nav-item {{ request()->is('dashboard') ? 'active' : '' }}" href="/dashboard">
+                <i class="fas fa-gauge"></i> Dashboard
+            </a>
+
+            <!-- 4. Personal Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle {{ request()->is('profile*') ? 'active' : '' }}" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-user"></i> Personal
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/profile"><i class="fas fa-id-card"></i> My Academic Profile</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/profile"><i class="fas fa-user-edit"></i> Update Personal Details</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/profile"><i class="fas fa-key"></i> Security Settings</a></li>
+                </ul>
+            </div>
+
+            <!-- 5. EMI Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-hand-holding-dollar"></i> EMI
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-calculator"></i> EMI Installments</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-file-invoice-dollar"></i> Fee Payment Ledger</a></li>
+                </ul>
+            </div>
+
+            <!-- 6. Timetable / Attendance Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle {{ request()->is('timetables*') ? 'active' : '' }}" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-calendar-alt"></i> Timetable / Attendance
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/timetables"><i class="fas fa-calendar-days"></i> View Class Timetable</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/timetables"><i class="fas fa-user-check"></i> My Attendance Logs</a></li>
+                </ul>
+            </div>
+
+            <!-- 7. Exam Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle {{ request()->is('exam*') ? 'active' : '' }}" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-file-signature"></i> Exam
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/admit-card"><i class="fas fa-id-badge"></i> Admit Card</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/results"><i class="fas fa-square-poll-vertical"></i> Exam Results</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/exam/excellence-cert"><i class="fas fa-certificate"></i> Excellence Certifications</a></li>
+                </ul>
+            </div>
+
+            <!-- 8. LMS Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle {{ request()->is('courses*') ? 'active' : '' }}" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-book-open"></i> LMS
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/courses"><i class="fas fa-graduation-cap"></i> All Enrolled Courses</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/courses"><i class="fas fa-book"></i> Course Syllabus</a></li>
+                </ul>
+            </div>
+
+            <!-- 9. Mid Exam Link -->
+            <a class="student-nav-item" href="/exam/results">
+                <i class="fas fa-pen-to-square"></i> Mid Exam
+            </a>
+
+            <!-- 10. Convocation Link -->
+            <a class="student-nav-item" href="/exam/excellence-cert">
+                <i class="fas fa-graduation-cap"></i> Convocation
+            </a>
+
+            <!-- 11. Fee Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-credit-card"></i> Fee
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-wallet"></i> Fee Ledger</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-receipt"></i> Pay Fees Online</a></li>
+                </ul>
+            </div>
+
+            <!-- 12. Mentoring Link -->
+            <a class="student-nav-item {{ request()->is('synergy-circle*') ? 'active' : '' }}" href="/synergy-circle">
+                <i class="fas fa-chart-line"></i> Mentoring
+            </a>
+
+            <!-- 13. Hostel Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-hotel"></i> Hostel
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="#" onclick="showMessMenu()"><i class="fas fa-hamburger"></i> Mess Menu</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/hub"><i class="fas fa-door-open"></i> Hostel Leave Requests</a></li>
+                </ul>
+            </div>
+
+            <!-- 14. Feedback Link -->
+            <a class="student-nav-item" href="/hub">
+                <i class="fas fa-comments"></i> Feedback
+            </a>
+
+            <!-- 15. Standalone Notices Link -->
+            <a class="student-nav-item {{ request()->is('circulars-notices*') ? 'active' : '' }}" href="/circulars-notices">
+                <i class="fas fa-bullhorn"></i> Notices
+            </a>
+
+            <!-- 16. Standalone Assignments Link -->
+            <a class="student-nav-item {{ request()->is('ipdc/vault*') ? 'active' : '' }}" href="/ipdc/vault">
+                <i class="fas fa-tasks"></i> Assignments
+            </a>
+
+            <!-- 17. Other Dropdown -->
+            <div class="dropdown">
+                <a class="student-nav-item dropdown-toggle {{ request()->is('time-capsule*') || request()->is('user-manual*') ? 'active' : '' }}" href="#" role="button" data-student-dropdown="true" aria-expanded="false">
+                    <i class="fas fa-cog"></i> Other
+                </a>
+                <ul class="dropdown-menu student-dropdown-menu">
+                    <li><a class="dropdown-item student-dropdown-item" href="/time-capsule"><i class="fas fa-hourglass-half"></i> Future Goal Capsule</a></li>
+                    <li><a class="dropdown-item student-dropdown-item" href="/user-manual"><i class="fas fa-file-lines"></i> User Manual</a></li>
+                    @if(session('demo_user_id') || session()->has('original_user_role'))
+                        <li><a class="dropdown-item student-dropdown-item text-danger fw-bold" href="/admin/exit-demo"><i class="fas fa-times me-1"></i> Exit Student Demo</a></li>
+                    @endif
+                    <li><a class="dropdown-item student-dropdown-item text-warning" href="/logout"><i class="fas fa-power-off me-1"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- JS Script to sync studentThemeToggle indicator with main themeToggle button -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const studentToggle = document.getElementById('studentThemeToggle');
+    const mainToggle = document.getElementById('themeToggle');
+    if (studentToggle && mainToggle) {
+        // Sync icon from main toggle initially
+        studentToggle.innerHTML = mainToggle.innerHTML;
+        // Observe changes
+        const observer = new MutationObserver(function() {
+            studentToggle.innerHTML = mainToggle.innerHTML;
+        });
+        observer.observe(mainToggle, { childList: true });
+    }
+
+    // Manage student dropdowns manually to prevent clipping in the overflow-x container
+    jQuery(document).ready(function($) {
+        // Toggle dropdown on click
+        $('.student-navbar').on('click', '.dropdown-toggle', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $toggle = $(this);
+            var $menu = $toggle.siblings('.dropdown-menu');
+            if (!$menu.length) return;
+            
+            var isShown = $menu.hasClass('show');
+            
+            // Close all other dropdowns
+            $('.student-navbar .dropdown-menu').removeClass('show').hide();
+            
+            if (!isShown) {
+                $menu.addClass('show').show();
+                
+                // Position menu dynamically relative to the toggle button viewport coordinates
+                var rect = this.getBoundingClientRect();
+                $menu.css({
+                    position: 'fixed',
+                    top: rect.bottom + 'px',
+                    left: rect.left + 'px',
+                    zIndex: 99999
+                });
+            }
+        });
+        
+        // Close dropdowns when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.student-navbar .dropdown').length) {
+                closeAllStudentDropdowns();
+            }
+        });
+
+        $(window).on('scroll resize', closeAllStudentDropdowns);
+
+        function closeAllStudentDropdowns() {
+            $('.student-navbar .dropdown-menu').removeClass('show').hide();
+        }
+    });
+});
+</script>
+@endif
+
 
 <!-- BAPS Premium Unified Circular Loader Overlay -->
 <div id="baps-global-loader" style="
@@ -131,6 +526,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
+@if(session('user_role') !== 'student')
 <aside class="sidebar" id="mainSidebar">
     <div class="mb-5 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
@@ -243,6 +639,7 @@ document.addEventListener("DOMContentLoaded", function() {
         @endif
     </nav>
 </aside>
+@endif
 
 
 <main>
@@ -257,7 +654,11 @@ document.addEventListener("DOMContentLoaded", function() {
             </form>
         </div>
         <div class="d-flex align-items-center gap-2 gap-md-3 mt-2 mt-lg-0">
-            @if(session('user_role') === 'dean' && session('staff_id') === 888)
+            @if(session()->has('original_user_role'))
+                <a href="/admin/exit-demo" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
+                    <i class="fas fa-sign-out-alt"></i> Exit Demo Mode
+                </a>
+            @elseif(session('user_role') === 'dean' && session('staff_id') === 888)
                 <a href="/admin/exit-demo" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm">
                     <i class="fas fa-sign-out-alt me-1"></i> Exit Dean Demo
                 </a>
@@ -268,7 +669,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <button id="themeToggle" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px;">
                 <i class="fas fa-moon"></i>
             </button>
-            @if(session('demo_user_id'))
+            @if(session('demo_user_id') && !session()->has('original_user_role'))
                 <a href="/admin/exit-demo" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm">
                     <i class="fas fa-times me-2"></i> Exit Student Demo
                 </a>
@@ -913,6 +1314,90 @@ function showAccessDenied(feature, requiredRole) {
             showStaticToast('Demo Mode: Submitting forms is disabled in this static GitHub Pages demo.');
         });
     })();
+</script>
+
+<!-- Hostel Mess Menu Modal -->
+<div class="modal fade" id="messMenuModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+            <div class="modal-header py-3 px-4 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+                <h5 class="modal-title fw-bold"><i class="fas fa-utensils me-2 text-warning"></i> Hostel Mess Weekly Menu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="background-color: #f8fafc;">
+                <div class="table-responsive">
+                    <table class="table table-bordered bg-white rounded-3 overflow-hidden shadow-sm" style="border-color: #e2e8f0; font-size: 0.85rem;">
+                        <thead class="text-white" style="background-color: #374151;">
+                            <tr>
+                                <th>Day</th>
+                                <th>Breakfast</th>
+                                <th>Lunch</th>
+                                <th>Tea & Snacks</th>
+                                <th>Dinner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold bg-light">Monday</td>
+                                <td>Idli Sambhar & Chutney</td>
+                                <td>Roti, Gujarati Shaak, Dal Fry, Jeera Rice</td>
+                                <td>Masala Tea & Parle-G</td>
+                                <td>Khichdi, Kadhi, Ringan Bharta</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Tuesday</td>
+                                <td>Poha & Jalebi</td>
+                                <td>Puri, Chole Masala, Veg Pulao, Raita</td>
+                                <td>Lemon Tea & Digestives</td>
+                                <td>Bhakri, Sev Tameta Shaak, Butter Milk</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Wednesday</td>
+                                <td>Aloo Paratha & Curd</td>
+                                <td>Roti, Paneer Tikka Masala, Yellow Dal, Chawal</td>
+                                <td>Ginger Tea & Samosa</td>
+                                <td>Vagharli Khichdi, Papad, Dahi</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Thursday</td>
+                                <td>Upma & Sheera</td>
+                                <td>Roti, Mix Kathol, Kadhi, Steam Rice</td>
+                                <td>Coffee & Salted Biscuits</td>
+                                <td>Rotla, Ringna no Oro, Jaggery</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Friday</td>
+                                <td>Methi Thepla & Pickle</td>
+                                <td>Puri, Aloo Dum, Dal Fry, Peas Pulao</td>
+                                <td>Mint Tea & Kachori</td>
+                                <td>Dal Dhokli & Rice Pudding</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Saturday</td>
+                                <td>Bread Butter & Jam</td>
+                                <td>Roti, Bhindi Masala, Dal, Rice, Salad</td>
+                                <td>Hot Milk & Bournvita</td>
+                                <td>Pav Bhaji & Pulav</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Sunday</td>
+                                <td>Chole Bhature</td>
+                                <td>Special feast: Paneer, Shrikhand, Dal Bati</td>
+                                <td>Special High Tea</td>
+                                <td>Kadhi Pulav & Sweet Sukhadi</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showMessMenu() {
+    new bootstrap.Modal(document.getElementById('messMenuModal')).show();
+}
 </script>
 
 </body>

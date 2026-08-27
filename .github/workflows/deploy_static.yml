@@ -54,6 +54,11 @@ jobs:
           touch database/database.sqlite
           php artisan migrate --force --seed
 
+      - name: Directory Permissions & Storage Structure
+        run: |
+          mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
+
       - name: Export Static Laravel Site
         run: |
           php export_static.php

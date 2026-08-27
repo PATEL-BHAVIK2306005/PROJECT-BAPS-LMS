@@ -4,6 +4,13 @@
  * Static Site Exporter for Laravel (GitHub Pages & Static Hosting)
  */
 
+// Ensure storage directories exist
+@mkdir(__DIR__ . '/storage/framework/sessions', 0777, true);
+@mkdir(__DIR__ . '/storage/framework/views', 0777, true);
+@mkdir(__DIR__ . '/storage/framework/cache/data', 0777, true);
+@mkdir(__DIR__ . '/storage/logs', 0777, true);
+@mkdir(__DIR__ . '/bootstrap/cache', 0777, true);
+
 require __DIR__ . '/vendor/autoload.php';
 $app = require_once __DIR__ . '/bootstrap/app.php';
 
@@ -73,6 +80,7 @@ $_ENV['STATIC_EXPORT'] = 'true';
 
 // Bootstrap application kernel
 $kernel->bootstrap();
+config(['session.driver' => 'array']);
 
 foreach ($routes as $uri => $outFile) {
     echo "Rendering $uri -> $outFile\n";

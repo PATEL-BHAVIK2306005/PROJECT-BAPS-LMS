@@ -75,6 +75,8 @@ $routes = [
     '/time-capsule' => 'time-capsule.html',
     '/circulars-notices' => 'circulars-notices.html',
     '/courses' => 'courses.html',
+    '/profile' => 'profile.html',
+    '/hub' => 'hub.html',
 ];
 
 putenv('STATIC_EXPORT=true');
@@ -84,39 +86,90 @@ $_ENV['STATIC_EXPORT'] = 'true';
 $kernel->bootstrap();
 config(['session.driver' => 'array']);
 
-// Client-side interactive helper for GitHub Pages static preview
+// Client-side interactive helper & router adapter for GitHub Pages
 $staticScript = <<<HTML
 <script>
-/** Deela LMS - GitHub Pages Interactive Routing & Demo Adapter **/
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Hide loader immediately once assets ready
-    var loader = document.getElementById('baps-global-loader');
-    if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(function() { loader.style.display = 'none'; }, 300);
-    }
+/** Deela LMS - Global GitHub Pages Subpath & Link Router Adapter **/
+(function() {
+    var REPO_PREFIX = '$repoPrefix';
 
-    // 2. Intercept Login/Auth forms for instant rich Demo Dashboard access
-    document.querySelectorAll('form').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            var action = (form.getAttribute('action') || '').toLowerCase();
-            if (action.includes('login') || action.includes('auth')) {
-                e.preventDefault();
-                var btn = form.querySelector('button[type="submit"]') || form.querySelector('button');
-                if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Entering Portal...';
-                setTimeout(function() {
-                    if (action.includes('admin') || window.location.href.includes('admin')) {
-                        window.location.href = '$repoPrefix/admin.html';
-                    } else if (action.includes('parent') || window.location.href.includes('parent')) {
-                        window.location.href = '$repoPrefix/parent/dashboard.html';
-                    } else {
-                        window.location.href = '$repoPrefix/dashboard.html';
-                    }
-                }, 500);
+    // 1. Hide loader immediately once DOM is ready
+    function dismissLoader() {
+        var loader = document.getElementById('baps-global-loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(function() { loader.style.display = 'none'; }, 300);
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', dismissLoader);
+    } else {
+        dismissLoader();
+    }
+    window.addEventListener('load', dismissLoader);
+    setTimeout(dismissLoader, 800);
+
+    // 2. Global Link Click Interceptor - Guarantees NEVER leaving /PROJECT-BAPS-LMS/ subpath
+    document.addEventListener('click', function(e) {
+        var a = e.target.closest('a');
+        if (!a) return;
+        var href = a.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('http://') || href.startsWith('https://')) {
+            return;
+        }
+
+        // If link is root-relative (starts with /) but does not have the repo prefix
+        if (href.startsWith('/') && !href.startsWith(REPO_PREFIX)) {
+            e.preventDefault();
+            var targetPage = href;
+            
+            // Map root
+            if (targetPage === '/' || targetPage === '') {
+                window.location.href = REPO_PREFIX + '/index.html';
+                return;
             }
-        });
-    });
-});
+            
+            // Map admin internal links
+            if (targetPage === '/admin') {
+                window.location.href = REPO_PREFIX + '/admin.html';
+                return;
+            }
+            if (targetPage.startsWith('/admin/') && targetPage !== '/admin/login') {
+                // If it's admin subpage on static preview, open admin portal
+                window.location.href = REPO_PREFIX + '/admin.html';
+                return;
+            }
+
+            // Append .html if needed
+            var cleanPath = targetPage;
+            if (!cleanPath.endsWith('.html') && !cleanPath.includes('.')) {
+                cleanPath = cleanPath + '.html';
+            }
+            
+            window.location.href = REPO_PREFIX + cleanPath;
+        }
+    }, true);
+
+    // 3. Intercept Login/Auth forms for instant rich Demo Dashboard access
+    document.addEventListener('submit', function(e) {
+        var form = e.target;
+        var action = (form.getAttribute('action') || '').toLowerCase();
+        if (action.includes('login') || action.includes('auth')) {
+            e.preventDefault();
+            var btn = form.querySelector('button[type="submit"]') || form.querySelector('button');
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Entering Portal...';
+            setTimeout(function() {
+                if (action.includes('admin') || window.location.href.includes('admin')) {
+                    window.location.href = REPO_PREFIX + '/admin.html';
+                } else if (action.includes('parent') || window.location.href.includes('parent')) {
+                    window.location.href = REPO_PREFIX + '/parent/dashboard.html';
+                } else {
+                    window.location.href = REPO_PREFIX + '/dashboard.html';
+                }
+            }, 400);
+        }
+    }, true);
+})();
 </script>
 HTML;
 
@@ -164,7 +217,7 @@ foreach ($routes as $uri => $outFile) {
     $content = preg_replace('/src="\/storage\//', 'src="' . $repoPrefix . '/storage/', $content);
     $content = preg_replace('/href="\/favicon\.ico"/', 'href="' . $repoPrefix . '/favicon.ico"', $content);
 
-    // Re-link internal navigation URLs to exported HTML files
+    // Re-link internal navigation URLs to exported HTML files with repo prefix
     $urlMappings = [
         'href="/"' => 'href="' . $repoPrefix . '/index.html"',
         'href="' . $repoPrefix . '/"' => 'href="' . $repoPrefix . '/index.html"',
@@ -177,16 +230,32 @@ foreach ($routes as $uri => $outFile) {
         'href="/parent/dashboard"' => 'href="' . $repoPrefix . '/parent/dashboard.html"',
         'href="/user-manual"' => 'href="' . $repoPrefix . '/user-manual.html"',
         'href="/timetables"' => 'href="' . $repoPrefix . '/timetables.html"',
+        'href="/admin/timetables"' => 'href="' . $repoPrefix . '/timetables.html"',
+        'href="/admin/attendance"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/placement"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/chat"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/profile"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/ipdc"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/exam/schedule"' => 'href="' . $repoPrefix . '/admin.html"',
         'href="/synergy-circle"' => 'href="' . $repoPrefix . '/synergy-circle.html"',
         'href="/ipdc/vault"' => 'href="' . $repoPrefix . '/ipdc/vault.html"',
         'href="/time-capsule"' => 'href="' . $repoPrefix . '/time-capsule.html"',
         'href="/circulars-notices"' => 'href="' . $repoPrefix . '/circulars-notices.html"',
         'href="/courses"' => 'href="' . $repoPrefix . '/courses.html"',
+        'href="/profile"' => 'href="' . $repoPrefix . '/profile.html"',
+        'href="/hub"' => 'href="' . $repoPrefix . '/hub.html"',
     ];
 
     foreach ($urlMappings as $from => $to) {
         $content = str_replace($from, $to, $content);
     }
+
+    // Replace any remaining root-relative href="/..." links with repo-prefixed links
+    $content = preg_replace_callback('/href="\/([a-zA-Z0-9_\-\/]+)"/', function($matches) use ($repoPrefix) {
+        $path = $matches[1];
+        if (str_starts_with($path, 'PROJECT-BAPS-LMS')) return $matches[0];
+        return 'href="' . $repoPrefix . '/' . $path . '.html"';
+    }, $content);
 
     // Inject static adapter script before </body>
     if (str_contains($content, '</body>')) {

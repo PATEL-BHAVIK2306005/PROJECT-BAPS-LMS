@@ -49,3 +49,6 @@ __pycache__/
 # Storage session files
 /storage/framework/sessions/*
 !/storage/framework/sessions/.gitignore
+
+# Build output
+/dist/

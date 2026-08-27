@@ -54,18 +54,9 @@ jobs:
           touch database/database.sqlite
           php artisan migrate --force --seed
 
-      - name: Start Built-in Laravel Server
+      - name: Export Static Laravel Site
         run: |
-          php artisan serve --port=8000 &
-          sleep 3
-
-      - name: Crawl and Export Laravel Pages to Static HTML
-        run: |
-          mkdir -p dist
-          cd dist
-          wget --mirror --page-requisites --adjust-extension --convert-links --no-parent -nH http://127.0.0.1:8000 http://127.0.0.1:8000/login http://127.0.0.1:8000/admin/login http://127.0.0.1:8000/register http://127.0.0.1:8000/parent/register http://127.0.0.1:8000/dashboard http://127.0.0.1:8000/admin http://127.0.0.1:8000/parent/dashboard http://127.0.0.1:8000/user-manual http://127.0.0.1:8000/logout || true
-          touch .nojekyll
-          cp index.html 404.html || true
+          php export_static.php
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

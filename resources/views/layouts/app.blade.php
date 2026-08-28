@@ -583,36 +583,36 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="mt-5 pt-4 border-top">
             <p class="text-uppercase text-muted small fw-bold mb-3">Management</p>
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'faculty', 'cr']))
-                <a href="/admin/chat" class="nav-link-custom {{ request()->is('admin/chat') ? 'active' : '' }}">
+                <a href="/admin/chat" data-tab-target="tab-directory" class="nav-link-custom {{ request()->is('admin/chat') ? 'active' : '' }}">
                     <i class="fas fa-comments"></i> Communications Chat
                 </a>
             @endif
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'cr']))
-                <a href="/admin/timetables" class="nav-link-custom {{ request()->is('admin/timetables') ? 'active' : '' }}">
+                <a href="/admin/timetables" data-tab-target="tab-academic" class="nav-link-custom {{ request()->is('admin/timetables') ? 'active' : '' }}">
                     <i class="fas fa-calendar-plus"></i> Manage Timetables
                 </a>
             @endif
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'faculty', 'cr']))
-                <a href="/admin/attendance" class="nav-link-custom {{ request()->is('admin/attendance') ? 'active' : '' }}">
+                <a href="/admin/attendance" data-tab-target="tab-academic" class="nav-link-custom {{ request()->is('admin/attendance') ? 'active' : '' }}">
                     <i class="fas fa-user-check"></i> Mark Attendance
                 </a>
             @endif
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant']))
-                <a href="/admin/placement" class="nav-link-custom {{ request()->is('admin/placement*') ? 'active' : '' }}">
+                <a href="/admin/placement" data-tab-target="tab-operations" class="nav-link-custom {{ request()->is('admin/placement*') ? 'active' : '' }}">
                     <i class="fas fa-briefcase text-primary"></i> Placement Cell
                 </a>
             @endif
-            <a href="/admin/profile" class="nav-link-custom {{ request()->is('admin/profile') ? 'active' : '' }}">
+            <a href="/admin/profile" data-tab-target="tab-directory" class="nav-link-custom {{ request()->is('admin/profile') ? 'active' : '' }}">
                 <i class="fas fa-user-shield"></i> My Admin Profile
             </a>
-            <a href="/admin/ipdc" class="nav-link-custom {{ request()->is('admin/ipdc*') ? 'active' : '' }}">
+            <a href="/admin/ipdc" data-tab-target="tab-ipdc" class="nav-link-custom {{ request()->is('admin/ipdc*') ? 'active' : '' }}">
                 <i class="fas fa-project-diagram text-warning"></i> Assignments Mgmt
             </a>
-            <a href="/admin/exam/schedule" class="nav-link-custom {{ request()->is('admin/exam/*') ? 'active' : '' }}">
+            <a href="/admin/exam/schedule" data-tab-target="tab-exams" class="nav-link-custom {{ request()->is('admin/exam/*') ? 'active' : '' }}">
                 <i class="fas fa-file-invoice text-info"></i> Exam Center Mgmt
             </a>
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'cr']))
-            <a href="/admin" class="nav-link-custom mt-3 px-3 py-2 text-white shadow-sm d-flex align-items-center" style="background: linear-gradient(135deg, #ea580c 0%, #d97706 100%); border-radius: 12px; font-weight: 500;">
+            <a href="/admin" data-tab-target="tab-overview" class="nav-link-custom mt-3 px-3 py-2 text-white shadow-sm d-flex align-items-center" style="background: linear-gradient(135deg, #ea580c 0%, #d97706 100%); border-radius: 12px; font-weight: 500;">
                 <i class="fas fa-lock fs-5 me-2 text-white"></i> Management Portal
             </a>
             @endif

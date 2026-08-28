@@ -1110,20 +1110,242 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    // Ensure first visible tab is active if current active is hidden
-    setTimeout(() => {
-        const activeBtn = document.querySelector('#adminDashboardTabs .nav-link.active');
-        if (activeBtn && activeBtn.closest('.nav-item').style.display === 'none') {
-            activeBtn.classList.remove('active');
-            const firstVisibleBtn = Array.from(document.querySelectorAll('#adminDashboardTabs .nav-link')).find(btn => btn.closest('.nav-item').style.display !== 'none');
-            if (firstVisibleBtn) {
-                firstVisibleBtn.classList.add('active');
-                const targetId = firstVisibleBtn.getAttribute('data-bs-target');
-                const targetPane = document.querySelector(targetId);
-                if (targetPane) targetPane.classList.add('active', 'show');
+    // 4. Tab Routing & Deep-Linking Engine
+    const TAB_ALIASES = {
+        'overview': 'tab-overview',
+        'academic': 'tab-academic',
+        'academics': 'tab-academic',
+        'attendance': 'tab-academic',
+        'timetables': 'tab-academic',
+        'timetable': 'tab-academic',
+        'exam': 'tab-exams',
+        'exams': 'tab-exams',
+        'exam-center': 'tab-exams',
+        'exam_center': 'tab-exams',
+        'examcenter': 'tab-exams',
+        'exam-schedule': 'tab-exams',
+        'seating': 'tab-exams',
+        'results': 'tab-exams',
+        'quiz': 'tab-exams',
+        'directory': 'tab-directory',
+        'staff': 'tab-directory',
+        'students': 'tab-directory',
+        'student': 'tab-directory',
+        'parents': 'tab-directory',
+        'parent': 'tab-directory',
+        'profile': 'tab-directory',
+        'chat': 'tab-directory',
+        'communications': 'tab-directory',
+        'approvals': 'tab-approvals',
+        'approval': 'tab-approvals',
+        'operations': 'tab-operations',
+        'campus': 'tab-operations',
+        'placement': 'tab-operations',
+        'talent-hub': 'tab-operations',
+        'hostel': 'tab-hostel',
+        'ipdc': 'tab-ipdc',
+        'ipdc-vault': 'tab-ipdc',
+        'assignments': 'tab-ipdc',
+        'assignment': 'tab-ipdc',
+        'vault': 'tab-ipdc',
+        'reports': 'tab-reports',
+        'report': 'tab-reports',
+        'system': 'tab-system',
+        'ai': 'tab-system',
+        'oa-coordination': 'tab-oa-coordination',
+        'oa': 'tab-oa-coordination',
+        'official-documents': 'tab-official-documents',
+        'documents': 'tab-official-documents',
+        'document-giving': 'tab-official-documents',
+        'circulars': 'tab-circulars',
+        'notices': 'tab-circulars',
+        'synergy-circle': 'tab-synergy-circle',
+        'synergy': 'tab-synergy-circle',
+        'volunteer': 'tab-volunteer',
+        'seva': 'tab-volunteer',
+        'role-settings': 'tab-role-settings',
+        'roles': 'tab-role-settings',
+        'payroll': 'tab-payroll',
+        'settings': 'tab-settings',
+        'maintenance': 'tab-maintenance',
+        'student-queries': 'tab-student-queries',
+        'queries': 'tab-student-queries',
+        'special-courses': 'tab-special-courses',
+        'special': 'tab-special-courses',
+        'admin-ptm': 'tab-admin-ptm',
+        'ptm': 'tab-admin-ptm',
+        'ptm-hub': 'tab-admin-ptm'
+    };
+
+    function resolveTabId(raw) {
+        if (!raw) return null;
+        let clean = String(raw).trim().toLowerCase();
+        clean = clean.replace(/^[#\/\?]+/, '').replace(/^tab[_\-\=]/, '');
+        clean = clean.replace(/\.html$/, '').replace(/^\/|\/$/g, '');
+        
+        // Exact element match
+        if (document.getElementById(clean) && document.getElementById(clean).classList.contains('tab-pane')) return clean;
+        if (document.getElementById('tab-' + clean) && document.getElementById('tab-' + clean).classList.contains('tab-pane')) return 'tab-' + clean;
+        
+        // Direct Alias match
+        if (TAB_ALIASES[clean]) return TAB_ALIASES[clean];
+        
+        // Substring matching
+        for (let k in TAB_ALIASES) {
+            if (clean === k || clean.includes(k) || k.includes(clean)) {
+                return TAB_ALIASES[k];
             }
         }
-    }, 100);
+        return null;
+    }
+
+    window.activateTab = function(targetTabId, updateUrl = true, smoothScroll = false) {
+        const canonicalId = resolveTabId(targetTabId);
+        if (!canonicalId) return false;
+
+        const targetPane = document.getElementById(canonicalId);
+        if (!targetPane) return false;
+
+        const navBtn = document.querySelector(`#adminDashboardTabs button[data-bs-target="#${canonicalId}"]`) ||
+                       document.querySelector(`#adminDashboardTabs [data-tab-id="${canonicalId}"] button`);
+        
+        // Deactivate all tab buttons & panes
+        document.querySelectorAll('#adminDashboardTabs .nav-link').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#adminDashboardTabsContent > .tab-pane').forEach(p => {
+            p.classList.remove('show', 'active');
+        });
+
+        // Activate requested tab
+        if (navBtn) {
+            navBtn.classList.add('active');
+            navBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+        targetPane.classList.add('show', 'active');
+
+        // Update URL hash without full reload
+        if (updateUrl) {
+            const cleanHash = canonicalId.replace(/^tab-/, '');
+            if (history.replaceState) {
+                history.replaceState(null, '', '#' + cleanHash);
+            } else {
+                location.hash = '#' + cleanHash;
+            }
+        }
+
+        if (smoothScroll) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return true;
+    };
+
+    // Attach click listeners to all tab buttons to sync URL
+    document.querySelectorAll('#adminDashboardTabs button[data-bs-toggle="tab"], #adminDashboardTabs button.baps-tab-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const target = this.getAttribute('data-bs-target') || this.dataset.bsTarget;
+            if (target && target.startsWith('#')) {
+                const rawTab = target.substring(1);
+                activateTab(rawTab, true, false);
+            }
+        });
+    });
+
+    // Intercept clicks on links pointing to admin sub-tabs or hashes
+    document.addEventListener('click', function(e) {
+        const a = e.target.closest('a');
+        if (!a) return;
+        const href = a.getAttribute('href');
+        const dataTab = a.getAttribute('data-tab-target');
+        
+        if (dataTab) {
+            e.preventDefault();
+            activateTab(dataTab, true, true);
+            return;
+        }
+
+        if (!href) return;
+
+        if (href.startsWith('#')) {
+            const tabId = resolveTabId(href);
+            if (tabId && document.getElementById(tabId)) {
+                e.preventDefault();
+                activateTab(tabId, true, true);
+            }
+        } else if (href.includes('admin') || href.includes('/admin')) {
+            let candidate = null;
+            if (href.includes('#')) {
+                candidate = href.split('#')[1];
+            } else if (href.includes('/admin/exam') || href.includes('exam')) {
+                candidate = 'exams';
+            } else if (href.includes('/admin/attendance') || href.includes('attendance')) {
+                candidate = 'academic';
+            } else if (href.includes('/admin/chat') || href.includes('/admin/profile') || href.includes('directory')) {
+                candidate = 'directory';
+            } else if (href.includes('/admin/placement') || href.includes('placement')) {
+                candidate = 'operations';
+            } else if (href.includes('/admin/ipdc') || href.includes('ipdc')) {
+                candidate = 'ipdc';
+            } else if (href.includes('/admin/approvals')) {
+                candidate = 'approvals';
+            } else if (href.endsWith('/admin') || href.endsWith('admin.html')) {
+                candidate = 'overview';
+            }
+
+            if (candidate) {
+                const tabId = resolveTabId(candidate);
+                if (tabId && document.getElementById(tabId)) {
+                    e.preventDefault();
+                    activateTab(tabId, true, true);
+                }
+            }
+        }
+    });
+
+    // Handle initial tab from URL hash, query parameter (?tab=exam), or pathname
+    function handleInitialRoute() {
+        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryTab = urlParams.get('tab') || urlParams.get('section');
+        
+        let pathTab = null;
+        const pathParts = window.location.pathname.split('/');
+        const lastPart = pathParts[pathParts.length - 1];
+        if (lastPart && lastPart !== 'admin.html' && lastPart !== 'admin' && !lastPart.includes('.')) {
+            pathTab = lastPart;
+        }
+
+        const requested = hash || queryTab || pathTab;
+        if (requested) {
+            const resolved = resolveTabId(requested);
+            if (resolved && activateTab(resolved, false, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Hash change listener
+    window.addEventListener('hashchange', function() {
+        const resolved = resolveTabId(window.location.hash);
+        if (resolved) activateTab(resolved, false, false);
+    });
+
+    // Initialize requested tab or fallback to first visible tab
+    setTimeout(() => {
+        const matched = handleInitialRoute();
+        if (!matched) {
+            const activeBtn = document.querySelector('#adminDashboardTabs .nav-link.active');
+            if (activeBtn && activeBtn.closest('.nav-item').style.display === 'none') {
+                activeBtn.classList.remove('active');
+                const firstVisibleBtn = Array.from(document.querySelectorAll('#adminDashboardTabs .nav-link')).find(btn => btn.closest('.nav-item').style.display !== 'none');
+                if (firstVisibleBtn) {
+                    firstVisibleBtn.classList.add('active');
+                    const targetId = firstVisibleBtn.getAttribute('data-bs-target');
+                    const targetPane = document.querySelector(targetId);
+                    if (targetPane) targetPane.classList.add('active', 'show');
+                }
+            }
+        }
+    }, 50);
 });
 </script>
 

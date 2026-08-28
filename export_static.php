@@ -129,14 +129,38 @@ $staticScript = <<<HTML
                 return;
             }
             
-            // Map admin internal links
-            if (targetPage === '/admin') {
-                window.location.href = REPO_PREFIX + '/admin.html';
+            // Map admin internal sub-routes to tabs
+            if (targetPage === '/admin' || targetPage === '/admin/') {
+                window.location.href = REPO_PREFIX + '/admin.html#tab-overview';
+                return;
+            }
+            if (targetPage.startsWith('/admin/timetables')) {
+                window.location.href = REPO_PREFIX + '/timetables.html';
                 return;
             }
             if (targetPage.startsWith('/admin/') && targetPage !== '/admin/login') {
-                // If it's admin subpage on static preview, open admin portal
-                window.location.href = REPO_PREFIX + '/admin.html';
+                var tab = '#tab-overview';
+                var lower = targetPage.toLowerCase();
+                if (lower.includes('exam')) tab = '#tab-exams';
+                else if (lower.includes('attendance')) tab = '#tab-academic';
+                else if (lower.includes('chat') || lower.includes('profile') || lower.includes('staff') || lower.includes('student')) tab = '#tab-directory';
+                else if (lower.includes('placement') || lower.includes('operation')) tab = '#tab-operations';
+                else if (lower.includes('ipdc') || lower.includes('assignment')) tab = '#tab-ipdc';
+                else if (lower.includes('approval')) tab = '#tab-approvals';
+                else if (lower.includes('hostel')) tab = '#tab-hostel';
+                else if (lower.includes('report')) tab = '#tab-reports';
+                else if (lower.includes('system')) tab = '#tab-system';
+                else if (lower.includes('ptm')) tab = '#tab-admin-ptm';
+                else if (lower.includes('circular')) tab = '#tab-circulars';
+                else if (lower.includes('synergy')) tab = '#tab-synergy-circle';
+                else if (lower.includes('special')) tab = '#tab-special-courses';
+                else if (lower.includes('query') || lower.includes('queries')) tab = '#tab-student-queries';
+                else if (lower.includes('payroll')) tab = '#tab-payroll';
+                else if (lower.includes('setting')) tab = '#tab-settings';
+                else if (lower.includes('maintenance')) tab = '#tab-maintenance';
+                else if (lower.includes('volunteer')) tab = '#tab-volunteer';
+
+                window.location.href = REPO_PREFIX + '/admin.html' + tab;
                 return;
             }
 
@@ -160,7 +184,7 @@ $staticScript = <<<HTML
             if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Entering Portal...';
             setTimeout(function() {
                 if (action.includes('admin') || window.location.href.includes('admin')) {
-                    window.location.href = REPO_PREFIX + '/admin.html';
+                    window.location.href = REPO_PREFIX + '/admin.html#tab-overview';
                 } else if (action.includes('parent') || window.location.href.includes('parent')) {
                     window.location.href = REPO_PREFIX + '/parent/dashboard.html';
                 } else {
@@ -226,17 +250,24 @@ foreach ($routes as $uri => $outFile) {
         'href="/register"' => 'href="' . $repoPrefix . '/register.html"',
         'href="/parent/register"' => 'href="' . $repoPrefix . '/parent/register.html"',
         'href="/dashboard"' => 'href="' . $repoPrefix . '/dashboard.html"',
-        'href="/admin"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin"' => 'href="' . $repoPrefix . '/admin.html#tab-overview"',
+        'href="/admin/"' => 'href="' . $repoPrefix . '/admin.html#tab-overview"',
         'href="/parent/dashboard"' => 'href="' . $repoPrefix . '/parent/dashboard.html"',
         'href="/user-manual"' => 'href="' . $repoPrefix . '/user-manual.html"',
         'href="/timetables"' => 'href="' . $repoPrefix . '/timetables.html"',
         'href="/admin/timetables"' => 'href="' . $repoPrefix . '/timetables.html"',
-        'href="/admin/attendance"' => 'href="' . $repoPrefix . '/admin.html"',
-        'href="/admin/placement"' => 'href="' . $repoPrefix . '/admin.html"',
-        'href="/admin/chat"' => 'href="' . $repoPrefix . '/admin.html"',
-        'href="/admin/profile"' => 'href="' . $repoPrefix . '/admin.html"',
-        'href="/admin/ipdc"' => 'href="' . $repoPrefix . '/admin.html"',
-        'href="/admin/exam/schedule"' => 'href="' . $repoPrefix . '/admin.html"',
+        'href="/admin/attendance"' => 'href="' . $repoPrefix . '/admin.html#tab-academic"',
+        'href="/admin/placement"' => 'href="' . $repoPrefix . '/admin.html#tab-operations"',
+        'href="/admin/chat"' => 'href="' . $repoPrefix . '/admin.html#tab-directory"',
+        'href="/admin/profile"' => 'href="' . $repoPrefix . '/admin.html#tab-directory"',
+        'href="/admin/ipdc"' => 'href="' . $repoPrefix . '/admin.html#tab-ipdc"',
+        'href="/admin/exam/schedule"' => 'href="' . $repoPrefix . '/admin.html#tab-exams"',
+        'href="/admin/exam"' => 'href="' . $repoPrefix . '/admin.html#tab-exams"',
+        'href="/admin/exams"' => 'href="' . $repoPrefix . '/admin.html#tab-exams"',
+        'href="/admin/approvals"' => 'href="' . $repoPrefix . '/admin.html#tab-approvals"',
+        'href="/admin/hostel"' => 'href="' . $repoPrefix . '/admin.html#tab-hostel"',
+        'href="/admin/reports"' => 'href="' . $repoPrefix . '/admin.html#tab-reports"',
+        'href="/admin/system"' => 'href="' . $repoPrefix . '/admin.html#tab-system"',
         'href="/synergy-circle"' => 'href="' . $repoPrefix . '/synergy-circle.html"',
         'href="/ipdc/vault"' => 'href="' . $repoPrefix . '/ipdc/vault.html"',
         'href="/time-capsule"' => 'href="' . $repoPrefix . '/time-capsule.html"',
@@ -277,9 +308,134 @@ foreach ($routes as $uri => $outFile) {
     }
 }
 
-// 7. Create 404.html fallback
-if (file_exists($distDir . '/index.html')) {
-    copy($distDir . '/index.html', $distDir . '/404.html');
+// 7. Generate redirect helper files for direct admin sub-paths
+$subTabRedirects = [
+    'admin/exam' => 'tab-exams',
+    'admin/exams' => 'tab-exams',
+    'admin/exam/schedule' => 'tab-exams',
+    'admin/attendance' => 'tab-academic',
+    'admin/academic' => 'tab-academic',
+    'admin/chat' => 'tab-directory',
+    'admin/profile' => 'tab-directory',
+    'admin/directory' => 'tab-directory',
+    'admin/placement' => 'tab-operations',
+    'admin/operations' => 'tab-operations',
+    'admin/ipdc' => 'tab-ipdc',
+    'admin/approvals' => 'tab-approvals',
+    'admin/hostel' => 'tab-hostel',
+    'admin/reports' => 'tab-reports',
+    'admin/system' => 'tab-system',
+    'admin/ptm' => 'tab-admin-ptm',
+    'admin/circulars' => 'tab-circulars',
+    'admin/synergy' => 'tab-synergy-circle',
+    'admin/special-courses' => 'tab-special-courses',
+    'admin/student-queries' => 'tab-student-queries',
+    'admin/role-settings' => 'tab-role-settings',
+    'admin/payroll' => 'tab-payroll',
+    'admin/volunteer' => 'tab-volunteer',
+    'admin/maintenance' => 'tab-maintenance',
+];
+
+foreach ($subTabRedirects as $subPath => $tabId) {
+    $redirectHtml = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=$repoPrefix/admin.html#$tabId">
+    <title>Redirecting to Management Portal...</title>
+    <script>
+        window.location.replace('$repoPrefix/admin.html#$tabId');
+    </script>
+</head>
+<body style="font-family:sans-serif; text-align:center; padding:50px; background:#f8fafc; color:#334155;">
+    <h2>BAPS LMS Administrative Portal</h2>
+    <p>Navigating to section...</p>
+    <a href="$repoPrefix/admin.html#$tabId" style="color:#ea580c; font-weight:bold;">Click here if not redirected automatically</a>
+</body>
+</html>
+HTML;
+    
+    $dirTarget = $distDir . '/' . $subPath . '/index.html';
+    @mkdir(dirname($dirTarget), 0777, true);
+    file_put_contents($dirTarget, $redirectHtml);
+
+    $fileTarget = $distDir . '/' . $subPath . '.html';
+    @mkdir(dirname($fileTarget), 0777, true);
+    file_put_contents($fileTarget, $redirectHtml);
 }
+
+// 8. Create intelligent SPA 404.html fallback for GitHub Pages
+$spa404Html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAPS LMS - Routing...</title>
+    <script>
+        (function() {
+            var repo = '$repoPrefix';
+            var path = window.location.pathname;
+            var search = window.location.search || '';
+            var hash = window.location.hash || '';
+
+            // Clean path
+            var relative = path;
+            if (relative.startsWith(repo)) {
+                relative = relative.substring(repo.length);
+            }
+            relative = relative.replace(/^\/+|\/+$/g, '');
+            var lower = relative.toLowerCase();
+
+            // 1. Admin sub-route or tab requests like admin.html/EXAM or admin/exam or admin/attendance
+            if (lower.includes('admin') || lower.includes('exam') || lower.includes('attendance') || lower.includes('chat') || lower.includes('placement')) {
+                var tab = 'tab-overview';
+                if (lower.includes('exam')) tab = 'tab-exams';
+                else if (lower.includes('attendance') || lower.includes('academic') || lower.includes('timetable')) tab = 'tab-academic';
+                else if (lower.includes('chat') || lower.includes('profile') || lower.includes('directory') || lower.includes('staff') || lower.includes('student')) tab = 'tab-directory';
+                else if (lower.includes('placement') || lower.includes('operation')) tab = 'tab-operations';
+                else if (lower.includes('ipdc') || lower.includes('assignment')) tab = 'tab-ipdc';
+                else if (lower.includes('approval')) tab = 'tab-approvals';
+                else if (lower.includes('hostel')) tab = 'tab-hostel';
+                else if (lower.includes('report')) tab = 'tab-reports';
+                else if (lower.includes('system')) tab = 'tab-system';
+                else if (lower.includes('ptm')) tab = 'tab-admin-ptm';
+                else if (lower.includes('circular')) tab = 'tab-circulars';
+                else if (lower.includes('synergy')) tab = 'tab-synergy-circle';
+                else if (lower.includes('special')) tab = 'tab-special-courses';
+                else if (lower.includes('query') || lower.includes('queries')) tab = 'tab-student-queries';
+                else if (lower.includes('payroll')) tab = 'tab-payroll';
+                else if (lower.includes('setting')) tab = 'tab-settings';
+                else if (lower.includes('maintenance')) tab = 'tab-maintenance';
+                else if (lower.includes('volunteer')) tab = 'tab-volunteer';
+
+                window.location.replace(repo + '/admin.html#' + tab);
+                return;
+            }
+
+            // 2. Main Page routes
+            var pages = ['dashboard', 'courses', 'hub', 'time-capsule', 'timetables', 'profile', 'circulars-notices', 'synergy-circle', 'login', 'register', 'user-manual'];
+            for (var i = 0; i < pages.length; i++) {
+                if (lower.includes(pages[i])) {
+                    window.location.replace(repo + '/' + pages[i] + '.html' + search + hash);
+                    return;
+                }
+            }
+
+            // 3. Fallback to index
+            window.location.replace(repo + '/index.html');
+        })();
+    </script>
+</head>
+<body style="font-family:system-ui,sans-serif; text-align:center; padding:50px; background:#f8fafc; color:#334155;">
+    <h2 style="color:#ea580c;">BAPS LMS Global Portal</h2>
+    <p>Navigating to your requested destination...</p>
+    <a href="$repoPrefix/index.html" style="color:#ea580c; font-weight:bold;">Click here to return to Home</a>
+</body>
+</html>
+HTML;
+
+file_put_contents($distDir . '/404.html', $spa404Html);
 
 echo "Static export completed successfully in dist/\n";

@@ -608,7 +608,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <a href="/admin/ipdc" data-tab-target="tab-ipdc" class="nav-link-custom {{ request()->is('admin/ipdc*') ? 'active' : '' }}">
                 <i class="fas fa-project-diagram text-warning"></i> Assignments Mgmt
             </a>
-            <a href="/admin/exam/schedule" data-tab-target="tab-exams" class="nav-link-custom {{ request()->is('admin/exam/*') ? 'active' : '' }}">
+            <a href="/admin/exam/schedule" class="nav-link-custom {{ request()->is('admin/exam/*') ? 'active' : '' }}">
                 <i class="fas fa-file-invoice text-info"></i> Exam Center Mgmt
             </a>
             @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'cr']))

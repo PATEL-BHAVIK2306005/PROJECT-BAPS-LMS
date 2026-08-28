@@ -75,6 +75,7 @@ $routes = [
     '/time-capsule' => 'time-capsule.html',
     '/circulars-notices' => 'circulars-notices.html',
     '/courses' => 'courses.html',
+    '/guest' => 'guest.html',
     '/profile' => 'profile.html',
     '/hub' => 'hub.html',
 ];
@@ -207,6 +208,8 @@ foreach ($routes as $uri => $outFile) {
         $sessionData = ['user_role' => 'admin', 'staff_name' => 'BHAVIKKUMAR PATEL', 'staff_id' => 1];
     } elseif (str_starts_with($uri, '/parent')) {
         $sessionData = ['user_role' => 'parent', 'user_id' => 1];
+    } elseif (in_array($uri, ['/', '/login', '/register', '/parent/register', '/courses', '/guest', '/user-manual'])) {
+        $sessionData = [];
     } else {
         $sessionData = ['demo_user_id' => 1, 'user_id' => 1];
     }
@@ -273,6 +276,7 @@ foreach ($routes as $uri => $outFile) {
         'href="/time-capsule"' => 'href="' . $repoPrefix . '/time-capsule.html"',
         'href="/circulars-notices"' => 'href="' . $repoPrefix . '/circulars-notices.html"',
         'href="/courses"' => 'href="' . $repoPrefix . '/courses.html"',
+        'href="/guest"' => 'href="' . $repoPrefix . '/courses.html"',
         'href="/profile"' => 'href="' . $repoPrefix . '/profile.html"',
         'href="/hub"' => 'href="' . $repoPrefix . '/hub.html"',
     ];

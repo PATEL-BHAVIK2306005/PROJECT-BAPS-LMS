@@ -59,8 +59,16 @@ Route::post('/logout', function () {
 |--------------------------------------------------------------------------
 | Public & Student Academic Routes
 |--------------------------------------------------------------------------
-*/
-Route::get('/', [CourseController::class, 'index'])->name('home');
+Route::get('/', function () {
+    if (session('user_role') === 'admin' || session('staff_id')) {
+        return redirect('/admin');
+    }
+    if (session('user_id') || \Illuminate\Support\Facades\Auth::check()) {
+        return redirect('/dashboard');
+    }
+    return app(\App\Http\Controllers\AuthController::class)->showLogin();
+})->name('home');
+Route::get('/guest', [CourseController::class, 'index'])->name('guest');
 Route::get('/dashboard', [CourseController::class, 'dashboard'])->name('dashboard');
 Route::post('/dashboard/assign-deputy-cr', [CourseController::class, 'assignDeputyCr']);
 Route::post('/dashboard/revoke-deputy-cr', [CourseController::class, 'revokeDeputyCr']);

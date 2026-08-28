@@ -627,24 +627,22 @@
                 $staffId = session('staff_id');
                 $staff = \App\Models\Staff::find($staffId);
                 $role = session('user_role');
-                $roleLabel = ucfirst($role);
-                if (in_array($role, ['admin', 'dean'])) { 
-                    if($role=='dean') $roleLabel="Dean (Department Head)"; 
-                    if($role=='admin') $roleLabel="Administrator";
-                    $roleLabel .= " - 200% Access";
+                $roleLabel = "Co-Dean (Academic & Institutional Governance)";
+                if ($role === 'dean' || $role === 'admin') {
+                    $roleLabel = "Co-Dean (Academic & Institutional Governance) - 200% Access";
+                } elseif ($role == 'hod') {
+                    $roleLabel = 'HOD (Head of Department)';
+                } elseif ($role == 'office-assistant') {
+                    $roleLabel = 'Office Assistant (Executive Administration)';
+                } elseif ($role == 'cr') {
+                    $roleLabel = 'Class Representative';
                 }
-                elseif ($role == 'hod') { $roleLabel = 'HOD (Head of Dept)'; }
-                elseif ($role == 'office-assistant') { $roleLabel = 'Office Assistant - 175% Access (Behalf of Dean)'; }
-                elseif (in_array($role, ['faculty', 'faculty-lecturer-lab'])) { $roleLabel = 'Faculty - Lecturer & Lab'; }
-                elseif ($role == 'coordinator') { $roleLabel = 'Coordinator'; }
-                elseif ($role == 'faculty-lecturer-coordinator') { $roleLabel = 'Faculty - Lecturer & Coordinator'; }
-                elseif ($role == 'cr') { $roleLabel = 'Class Representative'; }
             @endphp
             
             <div class="text-center text-sm-end">
                 <div class="mb-1">
-                    <span class="badge-role shadow-sm">
-                        {{ session('staff_name') ?? 'BHAVIKKUMAR PATEL' }}
+                    <span class="badge-role shadow-sm" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: none; padding: 8px 18px; font-size: 0.95rem;">
+                        <i class="fas fa-user-tie me-1"></i> {{ session('staff_name') ?? 'BHAVIKKUMAR PATEL' }}
                     </span>
                 </div>
                 <div class="small fw-bold text-muted">
@@ -655,7 +653,7 @@
             {{-- Admin Profile Photo --}}
             <div class="position-relative flex-shrink-0" style="width: 62px; height: 62px;">
                 <img id="adminProfileAvatar" 
-                     src="{{ ($staff && ($staff->profile_photo_data || $staff->profile_photo)) ? url('/profile/photo/staff/' . $staff->id) : 'https://ui-avatars.com/api/?name=' . urlencode(session('staff_name') ?? 'BHAVIKKUMAR PATEL') . '&background=f97316&color=fff&size=120' }}" 
+                     src="{{ ($staff && ($staff->profile_photo_data || $staff->profile_photo)) ? url('/profile/photo/staff/' . $staff->id) : 'https://ui-avatars.com/api/?name=' . urlencode(session('staff_name') ?? 'BHAVIKKUMAR PATEL') . '&background=ea580c&color=fff&size=120' }}" 
                      class="rounded-4 shadow-sm border border-2 border-white w-100 h-100" 
                      style="object-fit: cover; cursor: pointer;" 
                      title="Click to change photo">
@@ -668,146 +666,43 @@
     </div>
 </div>
 
-<!-- 10 TABS NAVIGATION (Perfectly Consolidated & Error-Free) -->
+<!-- 7 CORE EXECUTIVE PILLARS (Clean, Powerful, BAPS Institutional Governance) -->
 <ul class="nav nav-pills baps-nav-pills" id="adminDashboardTabs" role="tablist">
     <li class="nav-item" role="presentation" data-tab-id="tab-overview">
         <button class="nav-link active baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button" role="tab">
-            <i class="fas fa-chart-pie text-primary"></i> 1. Overview
+            <i class="fas fa-chart-pie text-primary"></i> 1. Executive Overview
         </button>
     </li>
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'faculty', 'cr', 'faculty-lecturer-lab', 'coordinator', 'faculty-lecturer-coordinator']))
     <li class="nav-item" role="presentation" data-tab-id="tab-academic">
         <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-academic" type="button" role="tab">
-            <i class="fas fa-graduation-cap text-success"></i> 2. Academic
+            <i class="fas fa-graduation-cap text-success"></i> 2. Academic Governance
         </button>
     </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'cr', 'hod', 'dean', 'office-assistant']) || session('staff_name') == 'Rajunakum Sir')
     <li class="nav-item" role="presentation" data-tab-id="tab-exams">
         <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-exams" type="button" role="tab">
-            <i class="fas fa-file-alt text-danger"></i> 3. Exams
+            <i class="fas fa-file-invoice text-danger"></i> 3. Examination Center
         </button>
     </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'cr']))
     <li class="nav-item" role="presentation" data-tab-id="tab-directory">
         <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-directory" type="button" role="tab">
-            <i class="fas fa-users text-info"></i> 4. Directory
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'cr', 'hod', 'dean', 'office-assistant']) || session('staff_name') == 'Rajunakum Sir')
-    <li class="nav-item" role="presentation" data-tab-id="tab-approvals">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-approvals" type="button" role="tab">
-            <i class="fas fa-check-circle text-warning"></i> 5. Approvals
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'cr', 'coordinator', 'faculty-lecturer-coordinator']) || session('staff_name') == 'Rajunakum Sir')
-    <li class="nav-item" role="presentation" data-tab-id="tab-operations">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-operations" type="button" role="tab">
-            <i class="fas fa-tasks text-purple" style="color: #9333ea;"></i> 6. Operations & Campus
-        </button>
-    </li>
-    @endif
-    <li class="nav-item" role="presentation" data-tab-id="tab-hostel">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-hostel" type="button" role="tab">
-            <i class="fas fa-bed text-secondary"></i> 7. Hostel Mgmt
+            <i class="fas fa-users text-info"></i> 4. Directory & Stakeholders
         </button>
     </li>
     <li class="nav-item" role="presentation" data-tab-id="tab-ipdc">
         <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-ipdc" type="button" role="tab">
-            <i class="fas fa-hand-holding-heart text-saffron" style="color: var(--baps-saffron);"></i> 8. IPDC Vault
+            <i class="fas fa-hand-holding-heart text-saffron" style="color: var(--baps-saffron);"></i> 5. IPDC & Character Excellence
         </button>
     </li>
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-reports">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-reports" type="button" role="tab">
-            <i class="fas fa-chart-line text-success"></i> 9. Reports
+    <li class="nav-item" role="presentation" data-tab-id="tab-operations">
+        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-operations" type="button" role="tab">
+            <i class="fas fa-city text-purple" style="color: #9333ea;"></i> 6. Campus Operations & Logistics
         </button>
     </li>
-    @endif
     <li class="nav-item" role="presentation" data-tab-id="tab-system">
         <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-system" type="button" role="tab">
-            <i class="fas fa-cog text-dark"></i> 10. System & AI Hub
+            <i class="fas fa-cog text-dark"></i> 7. System Governance & Settings
         </button>
     </li>
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-oa-coordination">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-oa-coordination" type="button" role="tab">
-            <i class="fas fa-handshake text-primary"></i> 11. OA Coordination
-        </button>
-    </li>
-    @endif
-    <li class="nav-item" role="presentation" data-tab-id="tab-official-documents">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-official-documents" type="button" role="tab">
-            <i class="fas fa-file-contract text-danger"></i> 12. Document Giving Vault
-        </button>
-    </li>
-    <li class="nav-item" role="presentation" data-tab-id="tab-circulars">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-circulars" type="button" role="tab">
-            <i class="fas fa-bullhorn text-warning"></i> 17. Circulars & Official Works
-        </button>
-    </li>
-    <li class="nav-item" role="presentation" data-tab-id="tab-synergy-circle">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-synergy-circle" type="button" role="tab">
-            <i class="fas fa-circle-nodes text-indigo" style="color: #6366f1 !important;"></i> 18. Synergy Circle
-        </button>
-    </li>
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-volunteer">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-volunteer" type="button" role="tab">
-            <i class="fas fa-hands-helping text-teal" style="color: #0d9488 !important;"></i> 13. Volunteer Service Log
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'dean']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-role-settings">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-role-settings" type="button" role="tab">
-            <i class="fas fa-user-shield text-dark" style="color: #0f172a !important;"></i> 14. Role Tab Setting
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-payroll">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-payroll" type="button" role="tab">
-            <i class="fas fa-file-invoice-dollar text-indigo" style="color: #4f46e5 !important;"></i> 15. Payroll Tab
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'dean']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-settings">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab">
-            <i class="fas fa-sliders-h text-secondary" style="color: #64748b !important;"></i> 16. Settings Tab
-        </button>
-    </li>
-    @endif
-    @if(session('user_role') === 'admin')
-    <li class="nav-item" role="presentation" data-tab-id="tab-maintenance">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-maintenance" type="button" role="tab">
-            <i class="fas fa-tools text-danger"></i> 21. Maintenance
-        </button>
-    </li>
-    @endif
-    <li class="nav-item" role="presentation" data-tab-id="tab-student-queries">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-student-queries" type="button" role="tab">
-            <i class="fas fa-question-circle text-info"></i> 19. Student Queries
-        </button>
-    </li>
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'faculty', 'cr', 'coordinator', 'faculty-lecturer-coordinator']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-special-courses">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-special-courses" type="button" role="tab">
-            <i class="fas fa-puzzle-piece text-danger" style="color: #ef4444 !important;"></i> 20. Special Courses
-        </button>
-    </li>
-    @endif
-    @if(in_array(session('user_role'), ['admin', 'dean', 'office-assistant', 'hod', 'faculty', 'cr', 'coordinator', 'faculty-lecturer-coordinator']))
-    <li class="nav-item" role="presentation" data-tab-id="tab-admin-ptm">
-        <button class="nav-link baps-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-admin-ptm" type="button" role="tab">
-            <i class="fas fa-comments text-danger"></i> 22. PTM Hub
-        </button>
-    </li>
-    @endif
 
     @php
         $customTabsFile = storage_path('app/custom_tabs.json');
@@ -1199,6 +1094,24 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
 
+    const PILLAR_PARENT_MAP = {
+        'tab-special-courses': 'tab-academic',
+        'tab-student-queries': 'tab-academic',
+        'tab-approvals': 'tab-directory',
+        'tab-admin-ptm': 'tab-directory',
+        'tab-volunteer': 'tab-ipdc',
+        'tab-synergy-circle': 'tab-ipdc',
+        'tab-hostel': 'tab-operations',
+        'tab-oa-coordination': 'tab-operations',
+        'tab-official-documents': 'tab-operations',
+        'tab-circulars': 'tab-operations',
+        'tab-reports': 'tab-system',
+        'tab-role-settings': 'tab-system',
+        'tab-payroll': 'tab-system',
+        'tab-settings': 'tab-system',
+        'tab-maintenance': 'tab-system'
+    };
+
     window.activateTab = function(targetTabId, updateUrl = true, smoothScroll = false) {
         const canonicalId = resolveTabId(targetTabId);
         if (!canonicalId) return false;
@@ -1206,8 +1119,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const targetPane = document.getElementById(canonicalId);
         if (!targetPane) return false;
 
-        const navBtn = document.querySelector(`#adminDashboardTabs button[data-bs-target="#${canonicalId}"]`) ||
-                       document.querySelector(`#adminDashboardTabs [data-tab-id="${canonicalId}"] button`);
+        const parentPillarId = PILLAR_PARENT_MAP[canonicalId] || canonicalId;
+        const navBtn = document.querySelector(`#adminDashboardTabs button[data-bs-target="#${parentPillarId}"]`) ||
+                       document.querySelector(`#adminDashboardTabs [data-tab-id="${parentPillarId}"] button`) ||
+                       document.querySelector(`#adminDashboardTabs button[data-bs-target="#${canonicalId}"]`);
         
         // Deactivate all tab buttons & panes
         document.querySelectorAll('#adminDashboardTabs .nav-link').forEach(b => b.classList.remove('active'));
@@ -1215,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             p.classList.remove('show', 'active');
         });
 
-        // Activate requested tab
+        // Activate requested tab nav button & pane
         if (navBtn) {
             navBtn.classList.add('active');
             navBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
